@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1428" />
+  <title>AI Teacher — Personalized Multimodal AI Learning Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🏫</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Profile Settings & Password Reset Modal -->
+  <div id="profileModal" class="modal-backdrop hidden">
+    <div class="modal-card card card-pad stack" style="max-width: 460px; width: 92%;">
+      <div class="modal-header">
+        <h3 style="margin: 0">Student Profile &amp; Settings</h3>
+        <button id="closeProfileModal" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Close modal">✕</button>
+      </div>
+
+      <form id="updateProfileForm" class="stack" novalidate>
+        <div class="field text-center">
+          <label>Profile Picture / Avatar</label>
+
+          <div id="modalAvatarPreviewContainer" class="avatar-preview-box">
+            <span id="modalAvatarPreviewDisplay" class="avatar-display-icon">🧑‍🎓</span>
+          </div>
+
+          <div class="avatar-picker" id="modalAvatarPicker">
+            <button type="button" class="avatar-opt active" data-avatar="🧑‍🎓">🧑‍🎓</button>
+            <button type="button" class="avatar-opt" data-avatar="👨‍🎓">👨‍🎓</button>
+            <button type="button" class="avatar-opt" data-avatar="👩‍🎓">👩‍🎓</button>
+            <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
+            <button type="button" class="avatar-opt" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-opt" data-avatar="🧠">🧠</button>
+          </div>
+
+          <div class="field" style="margin-top: 10px;">
+            <label for="customAvatarFile" class="muted" style="font-size: 0.82rem;">Or Upload Custom Image File</label>
+            <input class="input" id="customAvatarFile" type="file" accept="image/*" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="modalName">Full Name *</label>
+          <input class="input" id="modalName" type="text" required maxlength="80" />
+        </div>
+
+        <div class="field">
+          <label for="modalEmail">Email Address (Read Only)</label>
+          <input class="input" id="modalEmail" type="email" readonly style="opacity: 0.7; cursor: not-allowed;" />
+        </div>
+
+        <div class="field">
+          <label for="modalNewPassword">Set New Password <span class="muted">(optional)</span></label>
+          <input class="input" id="modalNewPassword" type="password" placeholder="Leave blank to keep current password" minlength="4" />
+        </div>
+
+        <p id="modalError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+
+        <button class="btn btn-primary btn-block" type="submit">
+          <span>Save Profile &amp; Password</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="AI Teacher home">
+        <span class="brand-mark" aria-hidden="true">🧑‍🏫</span>
+        <span>AI&nbsp;Teacher</span>
+      </a>
+
+      <div class="topbar-actions">
+        <button id="themeToggle" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Toggle dark/light theme" title="Toggle Dark/Light Mode">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <div id="userBadge" class="user-badge hidden" title="Click to Edit Profile & Avatar" style="cursor: pointer;">
+          <span id="userAvatarIcon" class="user-avatar-circle">🧑‍🎓</span>
+          <span id="userNameDisplay" class="user-name">Student</span>
+          <span class="edit-badge-icon" style="font-size: 0.7rem; opacity: 0.8;">✏️</span>
+        </div>
+        <button id="btnMyProgress" class="btn btn-ghost btn-sm hidden" type="button">
+          <span>📊 My History</span>
+        </button>
+        <button id="btnLogOut" class="btn btn-ghost btn-sm hidden" type="button">
+          <span>🚪 Log Out</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="section">
+
+      <!-- ==================== AUTH SCREEN ==================== -->
+      <section id="authScreen" class="card card-pad stack auth-screen" style="max-width: 480px; margin-inline: auto">
+        <div class="auth-header stack-sm text-center">
+          <span class="auth-logo">🧑‍🏫</span>
+          <h1 style="font-size: var(--fs-2); margin: 0">Welcome to AI Teacher</h1>
+          <p class="muted">Sign in to access your personalized learning portal</p>
+        </div>
+
+        <div class="auth-tabs" role="tablist">
+          <button id="tabLoginBtn" class="auth-tab active" role="tab" aria-selected="true" type="button">Sign In</button>
+          <button id="tabRegisterBtn" class="auth-tab" role="tab" aria-selected="false" type="button">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="stack" novalidate>
+          <div class="field">
+            <label for="loginEmail">Email Address *</label>
+            <input class="input" id="loginEmail" name="email" type="email" autocomplete="email"
+                   placeholder="student@example.com" required />
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Password *</label>
+            <input class="input" id="loginPassword" name="password" type="password" autocomplete="current-password"
+                   placeholder="Enter your password" required />
+          </div>
+
+          <p id="loginError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+
+          <button id="loginSubmitBtn" class="btn btn-primary btn-block" type="submit">
+            <span>Sign In to Learn</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="stack hidden" novalidate>
+          <div class="field">
+            <label for="regName">Full Name *</label>
+            <input class="input" id="regName" name="name" type="text" autocomplete="name"
+                   placeholder="Your name" required maxlength="80" />
+          </div>
+
+          <div class="field">
+            <label for="regEmail">Email Address *</label>
+            <input class="input" id="regEmail" name="email" type="email" autocomplete="email"
+                   placeholder="student@example.com" required />
+          </div>
+
+          <div class="field">
+            <label for="regPassword">Password *</label>
+            <input class="input" id="regPassword" name="password" type="password" autocomplete="new-password"
+                   placeholder="At least 4 characters" required minlength="4" />
+          </div>
+
+          <!-- Avatar / Profile Pic Selector -->
+          <div class="field text-center">
+            <label>Choose Your Avatar / Profile Pic</label>
+            <div id="regAvatarPreviewContainer" class="avatar-preview-box">
+              <span id="regAvatarPreviewDisplay" class="avatar-display-icon">🧑‍🎓</span>
+            </div>
+            <div class="avatar-picker" id="regAvatarPicker">
+              <button type="button" class="avatar-opt active" data-avatar="🧑‍🎓">🧑‍🎓</button>
+              <button type="button" class="avatar-opt" data-avatar="👨‍🎓">👨‍🎓</button>
+              <button type="button" class="avatar-opt" data-avatar="👩‍🎓">👩‍🎓</button>
+              <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
+              <button type="button" class="avatar-opt" data-avatar="🚀">🚀</button>
+              <button type="button" class="avatar-opt" data-avatar="🧠">🧠</button>
+            </div>
+            <div class="field" style="margin-top: 8px;">
+              <label for="regCustomAvatarFile" class="muted" style="font-size: 0.8rem;">Or Upload Image File</label>
+              <input class="input" id="regCustomAvatarFile" type="file" accept="image/*" />
+            </div>
+            <input type="hidden" id="regProfilePic" value="🧑‍🎓" />
+          </div>
+
+          <p id="registerError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+
+          <button id="registerSubmitBtn" class="btn btn-primary btn-block" type="submit">
+            <span>Register Account</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- ==================== 2-STEP PERSONALIZED WIZARD ==================== -->
+      <section id="wizardScreen" class="card card-pad stack hidden wizard-screen" style="max-width: 600px; margin-inline: auto">
+        <div class="wizard-header stack-sm text-center">
+          <div class="wizard-top-nav">
+            <button id="btnWizardBackToAuth" class="btn btn-ghost btn-sm" type="button">← Back to Log In</button>
+          </div>
+
+          <h1 style="font-size: var(--fs-2); margin-top: 8px;" id="wizardMainTitle">Set Up Your Personalized Lesson</h1>
+          <p class="muted" id="wizardSubtitle">Customize your teacher persona and topic</p>
+
+          <div class="wizard-progress-bar">
+            <div class="wizard-step-indicator active" id="stepIndicator1">
+              <span class="step-num">1</span>
+              <span class="step-label">Student Profile</span>
+            </div>
+            <div class="wizard-step-line"></div>
+            <div class="wizard-step-indicator" id="stepIndicator2">
+              <span class="step-num">2</span>
+              <span class="step-label">Learning Goals</span>
+            </div>
+          </div>
+        </div>
+
+        <form id="profileForm" novalidate>
+
+          <!-- STEP 1: Student Profile -->
+          <div id="wizardStep1" class="wizard-step-content stack">
+            <div class="field">
+              <label for="name">Student Name *</label>
+              <input class="input" id="name" name="name" type="text" autocomplete="name"
+                     placeholder="Enter your name" required maxlength="80" />
+            </div>
+
+            <div class="field">
+              <label for="educationLevel">Educational Level *</label>
+              <select class="select" id="educationLevel" name="educationLevel" required>
+                <option value="" disabled selected>Select your level…</option>
+                <option value="School">School</option>
+                <option value="High School">High School</option>
+                <option value="College">College</option>
+                <option value="University">University</option>
+                <option value="Professional">Professional</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="language">Preferred Language *</label>
+              <select class="select" id="language" name="language" required>
+                <option value="" disabled selected>Select a language…</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Kannada">Kannada</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="teachingStyle">Teaching Style *</label>
+              <select class="select" id="teachingStyle" name="teachingStyle" required>
+                <option value="" disabled selected>Select a style…</option>
+                <option value="Simple Explanation">Simple Explanation</option>
+                <option value="Visual">Visual</option>
+                <option value="Example-Based">Example-Based</option>
+                <option value="Step-by-Step">Step-by-Step</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="btnGoToStep2" type="button">
+              <span>Next: Learning Goals</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <!-- STEP 2: Learning Content & Goals -->
+          <div id="wizardStep2" class="wizard-step-content stack hidden">
+
+            <!-- Quick-Demo Topic Chips -->
+            <div class="field">
+              <label>⚡ Quick-Demo Sample Topics <span class="muted">(Click to auto-fill)</span></label>
+              <div class="topic-chips">
+                <button type="button" class="chip topic-chip" data-topic="Newton's Laws of Motion" data-obj="Understand 1st, 2nd & 3rd laws with real-world force examples">⚡ Newton's Laws</button>
+                <button type="button" class="chip topic-chip" data-topic="DNA Structure & Replication" data-obj="Learn double helix structure and step-by-step replication cycle">🧬 DNA Replication</button>
+                <button type="button" class="chip topic-chip" data-topic="Python Recursion & Stack Flow" data-obj="Understand call stack, base conditions, and recursive algorithms">💻 Python Recursion</button>
+                <button type="button" class="chip topic-chip" data-topic="Pythagorean Theorem & Geometry" data-obj="Master a² + b² = c² formula, right triangles, and applications">📐 Pythagoras Theorem</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="topic">Topic You Want to Learn</label>
+              <input class="input" id="topic" name="topic" type="text"
+                     placeholder="Enter a topic — or upload learning material below" maxlength="120" />
+            </div>
+
+            <div class="field">
+              <label for="materialFile">Upload Learning Material <span class="muted">(PDF, TXT, PPT/PPTX)</span></label>
+              <div class="upload-row">
+                <input class="input" id="materialFile" name="materialFile" type="file"
+                       accept=".pdf,.txt,.ppt,.pptx" />
+                <button class="btn btn-ghost" id="uploadBtn" type="button">
+                  <span>Extract Text</span>
+                </button>
+              </div>
+              <p id="materialMeta" class="muted hidden" aria-live="polite" style="color: var(--ok); font-size: 0.85rem; margin-top: 0.25rem"></p>
+            </div>
+
+            <div class="field">
+              <label for="objective">Learning Objective *</label>
+              <textarea class="textarea" id="objective" name="objective" rows="2"
+                        placeholder="What do you want to achieve from this lesson?" required maxlength="500"></textarea>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="availableTime">Study Time <span class="muted">(optional)</span></label>
+                <select class="select" id="availableTime" name="availableTime">
+                  <option value="">No time limit</option>
+                  <option value="10 minutes">10 minutes</option>
+                  <option value="20 minutes">20 minutes</option>
+                  <option value="30 minutes">30 minutes</option>
+                  <option value="45 minutes">45 minutes</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="desiredDepth">Desired Depth <span class="muted">(optional)</span></label>
+                <select class="select" id="desiredDepth" name="desiredDepth">
+                  <option value="">Balanced</option>
+                  <option value="Quick">Quick Essentials</option>
+                  <option value="Standard">Standard Lesson</option>
+                  <option value="Deep">Deep Dive</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="priorKnowledge">Existing Knowledge <span class="muted">(optional)</span></label>
+              <textarea class="textarea" id="priorKnowledge" name="priorKnowledge" rows="2" maxlength="500"
+                        placeholder="What do you already know about this topic?"></textarea>
+            </div>
+
+            <p id="formError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+
+            <div class="wizard-actions">
+              <button class="btn btn-ghost" id="btnBackToStep1" type="button">← Back to Profile</button>
+              <button class="btn btn-primary" id="startBtn" type="submit" style="flex: 1">
+                <span>Start Personalized Lesson</span>
+                <span aria-hidden="true">🚀</span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ==================== TEACHING SCREEN ==================== -->
+      <section id="teachingScreen" class="card card-pad stack hidden teaching-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+        <div class="teach-header">
+          <div class="teach-header-info">
+            <h2 id="ts-title" style="margin: 0"></h2>
+            <p class="muted" id="ts-meta" style="margin: 0"></p>
+          </div>
+          <div class="teach-progress">
+            <span class="muted" id="ts-progress-label"></span>
+            <div class="progress-track"><div id="ts-progress-bar"></div></div>
+          </div>
+        </div>
+
+        <div class="teach-stage" id="ts-stage">
+          <div class="teach-avatar" id="ts-avatar" data-state="idle" aria-label="AI Teacher avatar">
+            <div class="avatar-status-badge" id="avatarStatusBadge">
+              <span class="status-dot"></span>
+              <span id="avatarStatusText">Teaching</span>
+            </div>
+            <div class="speech-bubble" id="ts-bubble">Teaching…</div>
+            <svg class="teacher-figure" viewBox="0 0 120 140" aria-hidden="true">
+              <circle cx="60" cy="36" r="22" fill="#31d0ff" />
+              <circle cx="52" cy="32" r="3" fill="#0d1428" />
+              <circle cx="68" cy="32" r="3" fill="#0d1428" />
+              <path d="M52 46 q8 7 16 0" stroke="#0d1428" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M22 128c0-24 17-40 38-40s38 16 38 40z" fill="#7c6cff" />
+              <path d="M48 118 q12 14 24 0" stroke="#0d1428" stroke-width="3" fill="none" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="teach-visual" id="ts-visual">
+            <div class="visual-motif" id="ts-motif"></div>
+            <div class="visual-title" id="ts-visual-title"></div>
+            <div class="visual-note" id="ts-visual-note">Teaching…</div>
+          </div>
+        </div>
+
+        <!-- Voice Controls -->
+        <div id="ts-voice-controls" class="voice-controls">
+          <div class="voice-controls-inner">
+            <button class="btn btn-voice btn-voice-play" id="ts-voice-play" type="button" aria-label="Play voice">
+              <span aria-hidden="true">▶</span> Play Voice
+            </button>
+            <button class="btn btn-voice btn-voice-stop" id="ts-voice-stop" type="button" disabled aria-label="Stop voice">
+              <span aria-hidden="true">⏹</span> Stop
+            </button>
+            <div class="voice-rate-selector" id="ts-voice-rate" aria-label="Speech speed"></div>
+            <span class="voice-status" id="ts-voice-status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Subtitle Display -->
+        <div id="ts-subtitle" class="teach-subtitle hidden" aria-live="polite"></div>
+
+        <div class="teach-body" id="ts-body">
+          <h3 id="ts-section-title" class="teach-body-heading"></h3>
+          <div id="ts-text"></div>
+          <div id="ts-section-example" class="teach-example hidden"></div>
+        </div>
+
+        <div id="ts-question-area" class="teach-question-area hidden">
+          <div class="question-divider"></div>
+          <h3 class="question-heading">Check Your Understanding</h3>
+          <div id="ts-question-loading" class="question-loading hidden">
+            <span class="spinner"></span>
+            <span>Generating question…</span>
+          </div>
+          <div id="ts-question-content" class="question-content hidden">
+            <p id="ts-question-text" class="question-text"></p>
+            <div id="ts-mcq-options" class="option-list hidden"></div>
+            <div id="ts-short-answer" class="short-answer-area hidden">
+              <textarea class="textarea" id="ts-answer-input" rows="3"
+                        placeholder="Type your answer here…" maxlength="1000"></textarea>
+            </div>
+            <p id="ts-question-error" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+            <button class="btn btn-primary" id="ts-submit-answer" type="button">Submit Answer</button>
+          </div>
+          <div id="ts-evaluation-loading" class="question-loading hidden">
+            <span class="spinner"></span>
+            <span>Evaluating your answer…</span>
+          </div>
+          <div id="ts-feedback" class="feedback-area hidden">
+            <div id="ts-feedback-banner" class="feedback-banner"></div>
+            <p id="ts-feedback-text" class="feedback-text"></p>
+            <p id="ts-feedback-concept" class="feedback-concept muted hidden"></p>
+            <button class="btn btn-primary" id="ts-continue-lesson" type="button">Continue Lesson</button>
+          </div>
+        </div>
+
+        <!-- Adaptive Teaching Area -->
+        <div id="ts-adaptive-area" class="adaptive-area hidden">
+          <div class="adaptive-divider"></div>
+          <div id="ts-adaptive-loading" class="question-loading hidden">
+            <span class="spinner"></span>
+            <span>Analyzing your understanding…</span>
+          </div>
+          <div id="ts-adaptive-content" class="adaptive-content hidden">
+            <div id="ts-adaptive-banner" class="adaptive-banner"></div>
+            <div id="ts-adaptive-explanation" class="adaptive-explanation"></div>
+            <div id="ts-adaptive-example" class="adaptive-example hidden"></div>
+            <div id="ts-adaptive-followup" class="adaptive-followup hidden">
+              <h4 class="followup-heading">Quick Check</h4>
+              <div id="ts-adaptive-followup-loading" class="question-loading hidden">
+                <span class="spinner"></span>
+                <span>Generating follow-up question…</span>
+              </div>
+              <div id="ts-adaptive-followup-content" class="question-content hidden">
+                <p id="ts-adaptive-followup-text" class="question-text"></p>
+                <div id="ts-adaptive-mcq-options" class="option-list hidden"></div>
+                <div id="ts-adaptive-short-answer" class="short-answer-area hidden">
+                  <textarea class="textarea" id="ts-adaptive-answer-input" rows="3"
+                            placeholder="Type your answer here…" maxlength="1000"></textarea>
+                </div>
+                <p id="ts-adaptive-error" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+                <button class="btn btn-primary" id="ts-adaptive-submit" type="button">Submit Answer</button>
+              </div>
+              <div id="ts-adaptive-evaluation-loading" class="question-loading hidden">
+                <span class="spinner"></span>
+                <span>Evaluating your answer…</span>
+              </div>
+              <div id="ts-adaptive-feedback" class="feedback-area hidden">
+                <div id="ts-adaptive-feedback-banner" class="feedback-banner"></div>
+                <p id="ts-adaptive-feedback-text" class="feedback-text"></p>
+                <button class="btn btn-primary" id="ts-adaptive-continue" type="button">Continue Lesson</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ts-complete" class="teach-complete hidden">
+          <h3 class="complete-title"></h3>
+          <p class="complete-text muted"></p>
+          <div class="complete-stats"></div>
+        </div>
+
+        <div class="teach-nav">
+          <button class="btn btn-ghost" id="ts-prev" type="button">← Previous Section</button>
+          <button class="btn btn-primary" id="ts-next" type="button">Next Section →</button>
+        </div>
+
+        <button class="btn btn-ghost btn-block" id="ts-edit" type="button">← Back to Lesson Setup</button>
+      </section>
+
+      <!-- Lesson Video Recording Screen -->
+      <section id="recordingScreen" class="card card-pad stack hidden recording-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+        <div class="recording-header">
+          <h2 style="margin: 0">🎥 Record This Lesson</h2>
+          <span class="recording-timer" id="rec-timer" aria-live="off">00:00</span>
+        </div>
+        <p class="muted" id="rec-status" role="status"></p>
+
+        <div class="recording-stage">
+          <canvas id="rec-canvas" width="1280" height="720" class="recording-canvas" aria-label="Live recording preview"></canvas>
+          <div id="rec-preview-wrap" class="recording-preview hidden">
+            <video id="rec-preview" class="recording-video" controls playsinline></video>
+          </div>
+        </div>
+
+        <p class="muted rec-file-name" id="rec-file-name"></p>
+
+        <div class="recording-controls">
+          <button class="btn btn-primary" id="rec-start" type="button">🎥 Start Recording</button>
+          <button class="btn btn-ghost" id="rec-pause" type="button" disabled>⏸ Pause</button>
+          <button class="btn btn-ghost" id="rec-stop" type="button" disabled>⏹ Stop</button>
+          <button class="btn btn-ghost" id="rec-again" type="button" disabled>↺ Record Again</button>
+          <button class="btn btn-ghost btn-download" id="rec-download" type="button" disabled>⬇ Download Video</button>
+        </div>
+
+        <p class="muted rec-note" id="rec-note">Records teacher presentation, subtitles, and visual stage to video format.</p>
+        <p id="rec-unsupported" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+      </section>
+
+      <!-- Final Assessment Screen -->
+      <section id="assessmentScreen" class="card card-pad stack hidden assessment-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+        <div class="assessment-header">
+          <div class="screen-top-nav">
+            <button id="btnAssessmentBackToLesson" class="btn btn-ghost btn-sm" type="button">← Back to Lesson Stage</button>
+          </div>
+          <h2 id="assessment-title" style="margin-top: 8px;">Final Assessment</h2>
+          <p class="muted" id="assessment-subtitle"></p>
+          <div class="assessment-progress">
+            <span class="muted" id="assessment-progress-label"></span>
+            <div class="progress-track"><div id="assessment-progress-bar"></div></div>
+          </div>
+        </div>
+
+        <div id="assessment-loading" class="question-loading">
+          <span class="spinner"></span>
+          <span>Generating your assessment…</span>
+        </div>
+
+        <div id="assessment-content" class="assessment-content hidden">
+          <div id="assessment-questions"></div>
+          <p id="assessment-error" class="muted hidden" role="alert" style="color: var(--bad)"></p>
+          <button class="btn btn-primary btn-block" id="assessment-submit" type="button">Submit Assessment</button>
+        </div>
+
+        <div id="assessment-evaluation-loading" class="question-loading hidden">
+          <span class="spinner"></span>
+          <span>Evaluating your answers…</span>
+        </div>
+      </section>
+
+      <!-- Learning Report Screen -->
+      <section id="reportScreen" class="card card-pad stack hidden report-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+        <div class="report-header">
+          <h2>Your Personalized Learning Report</h2>
+          <button class="btn btn-ghost btn-sm" id="reportPrintBtn" type="button">🖨️ Print / Save Report</button>
+        </div>
+
+        <div id="report-loading" class="question-loading">
+          <span class="spinner"></span>
+          <span>Preparing your report…</span>
+        </div>
+
+        <div id="report-content" class="report-content hidden">
+          <div class="report-score-card">
+            <div class="score-circle" id="report-score-circle">
+              <span class="score-value" id="report-score-value"></span>
+              <span class="score-label">%</span>
+            </div>
+            <div class="score-details">
+              <p id="report-score-text" class="score-text"></p>
+              <p id="report-summary" class="report-summary muted"></p>
+            </div>
+          </div>
+
+          <div id="report-learning-path" class="report-section">
+            <h3 class="report-section-title">🗺️ Concept Learning Path Roadmap</h3>
+            <div id="report-path-steps" class="learning-path-steps"></div>
+          </div>
+
+          <div id="report-concepts-understood" class="report-section">
+            <h3 class="report-section-title">✓ Concepts You Understood</h3>
+            <ul id="report-concepts-list" class="report-list report-list-ok"></ul>
+          </div>
+
+          <div id="report-weak-areas" class="report-section">
+            <h3 class="report-section-title">◎ Areas That Need More Practice</h3>
+            <ul id="report-weak-list" class="report-list report-list-warn"></ul>
+          </div>
+
+          <div id="report-incorrect-concepts" class="report-section">
+            <h3 class="report-section-title">✗ Incorrect Concepts</h3>
+            <ul id="report-incorrect-list" class="report-list report-list-bad"></ul>
+          </div>
+
+          <div id="report-recommendations" class="report-section">
+            <h3 class="report-section-title">📝 Recommended Revision</h3>
+            <div id="report-recommendations-list"></div>
+          </div>
+
+          <div id="report-next-topic" class="report-section">
+            <h3 class="report-section-title">🚀 Suggested Next Topic</h3>
+            <p id="report-next-topic-text" class="report-next-topic"></p>
+          </div>
+
+          <div class="report-actions">
+            <button class="btn btn-primary btn-block" id="report-view-dashboard" type="button">View My History Dashboard 📊</button>
+            <button class="btn btn-ghost btn-block" id="report-new-lesson" type="button">Start New Lesson 🔄</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progress Dashboard -->
+      <section id="progressDashboard" class="card card-pad stack hidden progress-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+        <div class="progress-header">
+          <h2>My Learning History</h2>
+          <button class="btn btn-ghost btn-sm" id="progress-back" type="button">← Back to Setup</button>
+        </div>
+
+        <div id="progress-loading" class="question-loading">
+          <span class="spinner"></span>
+          <span>Loading your progress history…</span>
+        </div>
+
+        <div id="progress-error" class="muted hidden" role="alert" style="color: var(--bad)"></div>
+
+        <div id="progress-content" class="progress-content hidden">
+          <!-- Empty state -->
+          <div id="progress-empty-state" class="progress-empty-state hidden">
+            <div class="empty-icon">📊</div>
+            <h3>No learning history yet.</h3>
+            <p class="muted">Complete your first lesson to start tracking progress.</p>
+            <button class="btn btn-primary" id="progress-start-lesson" type="button">Start Learning</button>
+          </div>
+
+          <!-- Summary cards -->
+          <div id="progress-summary-cards" class="summary-cards hidden"></div>
+
+          <!-- Recent Activity -->
+          <div class="progress-section">
+            <h3 class="progress-section-title">Recent Learning Sessions</h3>
+            <div class="progress-table-wrapper">
+              <table class="progress-table">
+                <thead>
+                  <tr>
+                    <th>Topic</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="progress-history-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Strengths -->
+          <div id="progress-strengths" class="progress-section">
+            <h3 class="progress-section-title">✓ Your Strengths</h3>
+            <ul id="progress-strengths-list" class="progress-list progress-list-ok"></ul>
+          </div>
+
+          <!-- Weak Areas -->
+          <div id="progress-weak-areas" class="progress-section">
+            <h3 class="progress-section-title">◎ Needs Revision</h3>
+            <ul id="progress-weak-list" class="progress-list progress-list-warn"></ul>
+          </div>
+
+          <!-- Revision Recommendations -->
+          <div id="progress-recommendations" class="progress-section">
+            <h3 class="progress-section-title">📝 Recommended Revision</h3>
+            <div id="progress-recommendations-list"></div>
+          </div>
+
+          <!-- Next Topic -->
+          <div id="progress-next-topic" class="progress-section">
+            <h3 class="progress-section-title">🚀 Recommended Next Topic</h3>
+            <p id="progress-next-topic-text" class="progress-next-topic"></p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/speech.js"></script>
+  <script src="js/recording.js"></script>
+  <script src="js/teaching.js"></script>
+  <script src="js/assessment.js"></script>
+  <script src="js/progress.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* UI Elements */
+      var authScreen = document.getElementById('authScreen');
+      var wizardScreen = document.getElementById('wizardScreen');
+      var loginForm = document.getElementById('loginForm');
+      var registerForm = document.getElementById('registerForm');
+      var tabLoginBtn = document.getElementById('tabLoginBtn');
+      var tabRegisterBtn = document.getElementById('tabRegisterBtn');
+      var loginError = document.getElementById('loginError');
+      var registerError = document.getElementById('registerError');
+
+      var userBadge = document.getElementById('userBadge');
+      var userAvatarIcon = document.getElementById('userAvatarIcon');
+      var userNameDisplay = document.getElementById('userNameDisplay');
+      var btnMyProgress = document.getElementById('btnMyProgress');
+      var btnLogOut = document.getElementById('btnLogOut');
+      var themeToggle = document.getElementById('themeToggle');
+      var themeIcon = document.getElementById('themeIcon');
+      var toastContainer = document.getElementById('toastContainer');
+
+      /* Profile Modal Elements */
+      var profileModal = document.getElementById('profileModal');
+      var closeProfileModal = document.getElementById('closeProfileModal');
+      var updateProfileForm = document.getElementById('updateProfileForm');
+      var modalName = document.getElementById('modalName');
+      var modalEmail = document.getElementById('modalEmail');
+      var modalNewPassword = document.getElementById('modalNewPassword');
+      var modalError = document.getElementById('modalError');
+      var customAvatarFile = document.getElementById('customAvatarFile');
+      var regCustomAvatarFile = document.getElementById('regCustomAvatarFile');
+
+      /* Wizard Elements */
+      var wizardStep1 = document.getElementById('wizardStep1');
+      var wizardStep2 = document.getElementById('wizardStep2');
+      var stepIndicator1 = document.getElementById('stepIndicator1');
+      var stepIndicator2 = document.getElementById('stepIndicator2');
+      var btnGoToStep2 = document.getElementById('btnGoToStep2');
+      var btnBackToStep1 = document.getElementById('btnBackToStep1');
+      var btnWizardBackToAuth = document.getElementById('btnWizardBackToAuth');
+      var btnAssessmentBackToLesson = document.getElementById('btnAssessmentBackToLesson');
+      var profileForm = document.getElementById('profileForm');
+      var formError = document.getElementById('formError');
+      var startBtn = document.getElementById('startBtn');
+
+      var materialFile = document.getElementById('materialFile');
+      var uploadBtn = document.getElementById('uploadBtn');
+      var materialMeta = document.getElementById('materialMeta');
+      var uploadedMaterial = null;
+
+      /* Auth State */
+      var currentUser = JSON.parse(localStorage.getItem('ai_teacher_user') || 'null');
+
+      /* Helper to render avatar picture (Emoji OR Image URL) */
+      function renderAvatarElement(container, avatarValue) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!avatarValue) avatarValue = '🧑‍🎓';
+
+        if (avatarValue.startsWith('data:image/') || avatarValue.startsWith('http://') || avatarValue.startsWith('https://')) {
+          var img = document.createElement('img');
+          img.src = avatarValue;
+          img.className = 'avatar-img-custom';
+          img.alt = 'Profile Picture';
+          container.appendChild(img);
+        } else {
+          var span = document.createElement('span');
+          span.className = 'avatar-display-icon';
+          span.textContent = avatarValue;
+          container.appendChild(span);
+        }
+      }
+
+      /* Toast Notification helper */
+      function showToast(message, type) {
+        var toast = document.createElement('div');
+        toast.className = 'toast toast-' + (type || 'info');
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(function () { toast.classList.add('show'); }, 10);
+        setTimeout(function () {
+          toast.classList.remove('show');
+          setTimeout(function () { toast.remove(); }, 300);
+        }, 3500);
+      }
+      window.showToast = showToast;
+
+      /* Theme Toggle */
+      function initTheme() {
+        var currentTheme = localStorage.getItem('ai_teacher_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeIcon.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+      }
+
+      themeToggle.addEventListener('click', function () {
+        var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('ai_teacher_theme', theme);
+        themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        showToast('Switched to ' + theme + ' theme', 'info');
+      });
+
+      /* Auth Tab Switching */
+      tabLoginBtn.addEventListener('click', function () {
+        tabLoginBtn.classList.add('active');
+        tabRegisterBtn.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginError.classList.add('hidden');
+      });
+
+      tabRegisterBtn.addEventListener('click', function () {
+        tabRegisterBtn.classList.add('active');
+        tabLoginBtn.classList.remove('active');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+        registerError.classList.add('hidden');
+      });
+
+      /* Avatar Picker Logic */
+      function setupAvatarPicker(containerId, hiddenInputId, previewDisplayId) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        var options = container.querySelectorAll('.avatar-opt');
+        options.forEach(function (opt) {
+          opt.addEventListener('click', function () {
+            options.forEach(function (o) { o.classList.remove('active'); });
+            opt.classList.add('active');
+            var val = opt.getAttribute('data-avatar');
+            if (hiddenInputId) {
+              document.getElementById(hiddenInputId).value = val;
+            }
+            if (previewDisplayId) {
+              renderAvatarElement(document.getElementById(previewDisplayId), val);
+            }
+          });
+        });
+      }
+
+      setupAvatarPicker('regAvatarPicker', 'regProfilePic', 'regAvatarPreviewContainer');
+      setupAvatarPicker('modalAvatarPicker', null, 'modalAvatarPreviewContainer');
+
+      /* Helper to compress custom image uploads to compact Data URL thumbnails */
+      function compressImageFile(file, maxDimension, callback) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            var canvas = document.createElement('canvas');
+            var w = img.width;
+            var h = img.height;
+            if (w > maxDimension || h > maxDimension) {
+              if (w > h) {
+                h = Math.round((h * maxDimension) / w);
+                w = maxDimension;
+              } else {
+                w = Math.round((w * maxDimension) / h);
+                h = maxDimension;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            callback(compressedDataUrl);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      /* Handle Custom Image Upload File Reader for Registration */
+      regCustomAvatarFile.addEventListener('change', function () {
+        if (regCustomAvatarFile.files && regCustomAvatarFile.files[0]) {
+          compressImageFile(regCustomAvatarFile.files[0], 160, function (dataUrl) {
+            document.getElementById('regProfilePic').value = dataUrl;
+            renderAvatarElement(document.getElementById('regAvatarPreviewContainer'), dataUrl);
+            showToast('Custom profile picture selected!', 'info');
+          });
+        }
+      });
+
+      /* Handle Custom Image Upload File Reader for Modal Settings */
+      customAvatarFile.addEventListener('change', function () {
+        if (customAvatarFile.files && customAvatarFile.files[0]) {
+          compressImageFile(customAvatarFile.files[0], 160, function (dataUrl) {
+            renderAvatarElement(document.getElementById('modalAvatarPreviewContainer'), dataUrl);
+            // clear preset active state
+            document.querySelectorAll('#modalAvatarPicker .avatar-opt').forEach(function(o){ o.classList.remove('active'); });
+            showToast('Custom profile picture file selected!', 'info');
+          });
+        }
+      });
+
+      /* Register Handler */
+      registerForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        registerError.classList.add('hidden');
+
+        var name = document.getElementById('regName').value.trim();
+        var email = document.getElementById('regEmail').value.trim();
+        var password = document.getElementById('regPassword').value.trim();
+        var profilePic = document.getElementById('regProfilePic').value || '🧑‍🎓';
+
+        if (!name || !email || !password) {
+          registerError.textContent = 'Please fill out all required fields.';
+          registerError.classList.remove('hidden');
+          return;
+        }
+
+        try {
+          var res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, email: email, password: password, profilePic: profilePic })
+          });
+
+          var data = await res.json();
+          if (!res.ok) {
+            registerError.textContent = data.error || 'Registration failed.';
+            registerError.classList.remove('hidden');
+            return;
+          }
+
+          showToast('Account created successfully! Please sign in.', 'success');
+          document.getElementById('loginEmail').value = email;
+          tabLoginBtn.click();
+        } catch (err) {
+          registerError.textContent = 'Unable to connect to the server.';
+          registerError.classList.remove('hidden');
+        }
+      });
+
+      /* Login Handler */
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        loginError.classList.add('hidden');
+
+        var email = document.getElementById('loginEmail').value.trim();
+        var password = document.getElementById('loginPassword').value.trim();
+
+        if (!email || !password) {
+          loginError.textContent = 'Please enter email and password.';
+          loginError.classList.remove('hidden');
+          return;
+        }
+
+        try {
+          var res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+          });
+
+          var data = await res.json();
+          if (!res.ok) {
+            loginError.textContent = data.error || 'Invalid credentials.';
+            loginError.classList.remove('hidden');
+            return;
+          }
+
+          currentUser = data;
+          localStorage.setItem('ai_teacher_user', JSON.stringify(currentUser));
+          showToast('Welcome back, ' + currentUser.name + '! 👋', 'success');
+          updateAuthUI();
+        } catch (err) {
+          loginError.textContent = 'Unable to connect to the server.';
+          loginError.classList.remove('hidden');
+        }
+      });
+
+      /* Update Auth UI */
+      function updateAuthUI() {
+        if (currentUser) {
+          authScreen.classList.add('hidden');
+          wizardScreen.classList.remove('hidden');
+          userNameDisplay.textContent = currentUser.name;
+          document.getElementById('name').value = currentUser.name;
+
+          renderAvatarElement(userAvatarIcon, currentUser.profilePic || '🧑‍🎓');
+
+          userBadge.classList.remove('hidden');
+          btnMyProgress.classList.remove('hidden');
+          btnLogOut.classList.remove('hidden');
+        } else {
+          authScreen.classList.remove('hidden');
+          wizardScreen.classList.add('hidden');
+          document.getElementById('teachingScreen').classList.add('hidden');
+          document.getElementById('progressDashboard').classList.add('hidden');
+          document.getElementById('reportScreen').classList.add('hidden');
+          userBadge.classList.add('hidden');
+          btnMyProgress.classList.add('hidden');
+          btnLogOut.classList.add('hidden');
+        }
+      }
+
+      /* Profile Modal Editing & Password Reset */
+      userBadge.addEventListener('click', function () {
+        if (!currentUser) return;
+        modalName.value = currentUser.name;
+        modalEmail.value = currentUser.email;
+        modalNewPassword.value = '';
+        modalError.classList.add('hidden');
+
+        renderAvatarElement(document.getElementById('modalAvatarPreviewContainer'), currentUser.profilePic || '🧑‍🎓');
+
+        var options = document.querySelectorAll('#modalAvatarPicker .avatar-opt');
+        options.forEach(function (opt) {
+          if (opt.getAttribute('data-avatar') === currentUser.profilePic) {
+            opt.classList.add('active');
+          } else {
+            opt.classList.remove('active');
+          }
+        });
+
+        profileModal.classList.remove('hidden');
+      });
+
+      closeProfileModal.addEventListener('click', function () {
+        profileModal.classList.add('hidden');
+      });
+
+      /* Save Profile Update & Reset Password */
+      updateProfileForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        modalError.classList.add('hidden');
+
+        var newName = modalName.value.trim();
+        var newPass = modalNewPassword.value.trim();
+        var selectedOpt = document.querySelector('#modalAvatarPicker .avatar-opt.active');
+        var newAvatar = currentUser.profilePic || '🧑‍🎓';
+
+        if (selectedOpt) {
+          newAvatar = selectedOpt.getAttribute('data-avatar');
+        }
+
+        if (customAvatarFile.files && customAvatarFile.files[0]) {
+          var file = customAvatarFile.files[0];
+          compressImageFile(file, 160, function (dataUrl) {
+            newAvatar = dataUrl;
+            saveProfileUpdate(newName, newAvatar, newPass);
+          });
+        } else {
+          saveProfileUpdate(newName, newAvatar, newPass);
+        }
+      });
+
+      async function saveProfileUpdate(newName, newAvatar, newPass) {
+        var payload = {
+          email: currentUser.email,
+          name: newName,
+          profilePic: newAvatar
+        };
+
+        if (newPass) {
+          if (newPass.length < 4) {
+            modalError.textContent = 'New password must be at least 4 characters long.';
+            modalError.classList.remove('hidden');
+            return;
+          }
+          payload.newPassword = newPass;
+        }
+
+        try {
+          var res = await fetch('/api/auth/profile/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          var data = await res.json();
+          if (!res.ok) {
+            modalError.textContent = data.error || 'Profile update failed.';
+            modalError.classList.remove('hidden');
+            return;
+          }
+
+          currentUser.name = data.name;
+          currentUser.profilePic = data.profilePic;
+          localStorage.setItem('ai_teacher_user', JSON.stringify(currentUser));
+          updateAuthUI();
+          profileModal.classList.add('hidden');
+
+          var msg = newPass ? 'Profile & new password saved successfully!' : 'Profile & avatar updated!';
+          showToast(msg, 'success');
+        } catch (err) {
+          modalError.textContent = 'Unable to connect to the server.';
+          modalError.classList.remove('hidden');
+        }
+      }
+
+      btnLogOut.addEventListener('click', function () {
+        currentUser = null;
+        localStorage.removeItem('ai_teacher_user');
+        showToast('Logged out successfully.', 'info');
+        updateAuthUI();
+      });
+
+      btnMyProgress.addEventListener('click', function () {
+        if (!currentUser) return;
+        document.getElementById('wizardScreen').classList.add('hidden');
+        document.getElementById('teachingScreen').classList.add('hidden');
+        document.getElementById('reportScreen').classList.add('hidden');
+        if (window.AiTeacherProgress) {
+          window.AiTeacherProgress.loadProgress(currentUser.name);
+        }
+      });
+
+      /* Back Arrow Handlers across screens */
+      btnWizardBackToAuth.addEventListener('click', function () {
+        wizardScreen.classList.add('hidden');
+        authScreen.classList.remove('hidden');
+      });
+
+      if (btnAssessmentBackToLesson) {
+        btnAssessmentBackToLesson.addEventListener('click', function () {
+          document.getElementById('assessmentScreen').classList.add('hidden');
+          document.getElementById('teachingScreen').classList.remove('hidden');
+        });
+      }
+
+      btnGoToStep2.addEventListener('click', function () {
+        var name = document.getElementById('name').value.trim();
+        var edu = document.getElementById('educationLevel').value;
+        var lang = document.getElementById('language').value;
+        var style = document.getElementById('teachingStyle').value;
+
+        if (!name || !edu || !lang || !style) {
+          showToast('Please complete all required fields in Step 1.', 'warn');
+          return;
+        }
+
+        wizardStep1.classList.add('hidden');
+        wizardStep2.classList.remove('hidden');
+        stepIndicator1.classList.remove('active');
+        stepIndicator2.classList.add('active');
+      });
+
+      btnBackToStep1.addEventListener('click', function () {
+        wizardStep2.classList.add('hidden');
+        wizardStep1.classList.remove('hidden');
+        stepIndicator2.classList.remove('active');
+        stepIndicator1.classList.add('active');
+      });
+
+      /* Quick-Demo Chips */
+      document.querySelectorAll('.topic-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var topic = chip.getAttribute('data-topic');
+          var obj = chip.getAttribute('data-obj');
+          document.getElementById('topic').value = topic;
+          document.getElementById('objective').value = obj;
+          showToast('Selected sample topic: ' + topic, 'info');
+        });
+      });
+
+      /* File Extraction */
+      uploadBtn.addEventListener('click', function () {
+        if (!materialFile.files.length) {
+          showToast('Please choose a file to extract.', 'warn');
+          return;
+        }
+
+        var fd = new FormData();
+        fd.append('file', materialFile.files[0]);
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Extracting…';
+
+        fetch('/api/material/upload', {
+          method: 'POST',
+          body: fd
+        }).then(function (res) {
+          return res.json().then(function (data) {
+            if (!res.ok) { throw new Error((data && data.error) || 'Extraction failed'); }
+            return data;
+          });
+        }).then(function (doc) {
+          uploadedMaterial = doc;
+          var pages = doc.pageCount ? (doc.pageCount + (doc.pageCount === 1 ? ' page' : ' pages')) : 'no page count';
+          materialMeta.textContent = doc.fileName + ' · ' + pages + ' · ' + doc.characterCount.toLocaleString() + ' chars ready.';
+          materialMeta.classList.remove('hidden');
+          showToast('File text extracted successfully!', 'success');
+        }).catch(function (err) {
+          uploadedMaterial = null;
+          materialMeta.classList.add('hidden');
+          showToast(err.message, 'error');
+        }).finally(function () {
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = 'Extract Text';
+        });
+      });
+
+      /* Lesson Generation Submit */
+      profileForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        var values = {
+          name: document.getElementById('name').value.trim(),
+          educationLevel: document.getElementById('educationLevel').value,
+          language: document.getElementById('language').value,
+          teachingStyle: document.getElementById('teachingStyle').value,
+          objective: document.getElementById('objective').value.trim(),
+          topic: document.getElementById('topic').value.trim(),
+          priorKnowledge: document.getElementById('priorKnowledge').value.trim(),
+          availableTime: document.getElementById('availableTime').value,
+          desiredDepth: document.getElementById('desiredDepth').value,
+          uploadedMaterial: uploadedMaterial ? uploadedMaterial.extractedText : null,
+          profilePic: currentUser ? currentUser.profilePic : '🧑‍🎓'
+        };
+
+        if (!values.name || !values.educationLevel || !values.language || !values.teachingStyle || !values.objective ||
+            (!values.topic && !values.uploadedMaterial)) {
+          showToast('Please complete required fields or upload material.', 'warn');
+          return;
+        }
+
+        startBtn.disabled = true;
+        startBtn.textContent = 'Preparing lesson…';
+
+        try {
+          var profileRes = await fetch('/api/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(values)
+          });
+          if (!profileRes.ok) { throw new Error('Failed to save profile'); }
+
+          var planRes = await fetch('/api/lesson/plan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(values)
+          });
+
+          if (!planRes.ok) {
+            var body = await planRes.json();
+            throw new Error((body && body.error) || 'Failed to generate lesson plan');
+          }
+
+          var plan = await planRes.json();
+          wizardScreen.classList.add('hidden');
+          showToast('Your personalized lesson is ready!', 'success');
+          window.AiTeacherTeaching.render(plan, values);
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          startBtn.disabled = false;
+          startBtn.textContent = 'Start Personalized Lesson 🚀';
+        }
+      });
+
+      /* Init theme and auth */
+      initTheme();
+      updateAuthUI();
+    })();
+  </script>
+</body>
+</html>

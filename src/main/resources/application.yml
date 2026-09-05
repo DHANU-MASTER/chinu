@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ai-teacher
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
+
+  datasource:
+    # File-backed H2 so progress survives application restarts (jdbc:h2:file).
+    # Only one app instance may run at a time; stop the previous one first.
+    url: jdbc:h2:file:./data/aiteacherdb;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
