@@ -20,6 +20,59 @@
     <button id="btnDismissSession" class="btn btn-sm btn-ghost" type="button">Dismiss</button>
   </div>
 
+  <!-- Add Custom Study Slot Modal -->
+  <div id="addSlotModal" class="modal-backdrop hidden">
+    <div class="modal-card card card-pad stack" style="max-width: 440px; width: 92%;">
+      <div class="modal-header">
+        <h3 style="margin: 0">Add Custom Study Slot</h3>
+        <button id="closeSlotModal" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Close modal">✕</button>
+      </div>
+
+      <form id="addSlotForm" class="stack" novalidate>
+        <div class="field">
+          <label for="slotDay">Select Day *</label>
+          <select class="select" id="slotDay" required>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="slotTimeBlock">Time Block *</label>
+          <select class="select" id="slotTimeBlock" required>
+            <option value="Morning">Morning (9:00 AM)</option>
+            <option value="Afternoon">Afternoon (2:00 PM)</option>
+            <option value="Evening">Evening (7:00 PM)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="slotTopic">Study Topic *</label>
+          <input class="input" id="slotTopic" type="text" placeholder="e.g. Newton's Laws or Python Recursion" required maxlength="100" />
+        </div>
+
+        <div class="field">
+          <label for="slotDuration">Target Duration *</label>
+          <select class="select" id="slotDuration">
+            <option value="10 minutes">10 minutes</option>
+            <option value="20 minutes" selected>20 minutes</option>
+            <option value="30 minutes">30 minutes</option>
+            <option value="45 minutes">45 minutes</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">
+          <span>Save Study Slot</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Profile Settings & Password Reset Modal -->
   <div id="profileModal" class="modal-backdrop hidden">
     <div class="modal-card card card-pad stack" style="max-width: 460px; width: 92%;">
@@ -91,6 +144,9 @@
           <span id="userNameDisplay" class="user-name">Student</span>
           <span class="edit-badge-icon" style="font-size: 0.7rem; opacity: 0.8;">✏️</span>
         </div>
+        <button id="btnTimetable" class="btn btn-ghost btn-sm hidden" type="button">
+          <span>📅 Timetable</span>
+        </button>
         <button id="btnMyProgress" class="btn btn-ghost btn-sm hidden" type="button">
           <span>📊 My History</span>
         </button>
@@ -665,6 +721,38 @@
         </div>
       </section>
 
+      <!-- AI Study Timetable & Schedule Planner Screen -->
+      <section id="timetableDashboard" class="card card-pad stack hidden timetable-screen" style="max-width: 880px; margin-inline: auto" aria-live="polite">
+        <div class="timetable-header">
+          <div>
+            <h2 style="margin: 0">📅 AI Study Timetable &amp; Schedule Planner</h2>
+            <p class="muted" style="margin: 0">Manage your daily study schedule and auto-generate AI revision plans</p>
+          </div>
+          <div class="timetable-actions-row">
+            <button id="btnAutoGenerateTimetable" class="btn btn-primary btn-sm" type="button">🤖 Generate AI Schedule</button>
+            <button id="btnOpenAddSlotModal" class="btn btn-ghost btn-sm" type="button">➕ Add Slot</button>
+            <button id="btnTimetableBack" class="btn btn-ghost btn-sm" type="button">← Back</button>
+          </div>
+        </div>
+
+        <div class="timetable-grid" id="timetableGridContainer">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Leaderboard Card -->
+        <div class="card card-pad stack" style="margin-top: 16px;">
+          <h3 style="margin: 0; font-size: var(--fs-3); color: var(--brand-2);">🏆 Top Performers &amp; Mastery Ranks</h3>
+          <div class="leaderboard-list" id="leaderboardListContainer">
+            <div class="leaderboard-item">
+              <span class="leaderboard-rank">#1</span>
+              <span class="leaderboard-avatar">🧪</span>
+              <span class="leaderboard-name">Integration Student</span>
+              <span class="leaderboard-score">80.0% (Supreme Haki Master)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Progress Dashboard -->
       <section id="progressDashboard" class="card card-pad stack hidden progress-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
         <div class="progress-header">
@@ -760,11 +848,22 @@
       var userBadge = document.getElementById('userBadge');
       var userAvatarIcon = document.getElementById('userAvatarIcon');
       var userNameDisplay = document.getElementById('userNameDisplay');
+      var btnTimetable = document.getElementById('btnTimetable');
       var btnMyProgress = document.getElementById('btnMyProgress');
       var btnLogOut = document.getElementById('btnLogOut');
       var themeToggle = document.getElementById('themeToggle');
       var themeIcon = document.getElementById('themeIcon');
       var toastContainer = document.getElementById('toastContainer');
+
+      /* Timetable Elements */
+      var timetableDashboard = document.getElementById('timetableDashboard');
+      var timetableGridContainer = document.getElementById('timetableGridContainer');
+      var btnAutoGenerateTimetable = document.getElementById('btnAutoGenerateTimetable');
+      var btnOpenAddSlotModal = document.getElementById('btnOpenAddSlotModal');
+      var btnTimetableBack = document.getElementById('btnTimetableBack');
+      var addSlotModal = document.getElementById('addSlotModal');
+      var closeSlotModal = document.getElementById('closeSlotModal');
+      var addSlotForm = document.getElementById('addSlotForm');
 
       /* Auto-Save Session Recovery */
       var resumeSessionBanner = document.getElementById('resumeSessionBanner');
@@ -802,6 +901,7 @@
 
       /* Auth State */
       var currentUser = JSON.parse(localStorage.getItem('ai_teacher_user') || 'null');
+      var userSchedule = JSON.parse(localStorage.getItem('ai_teacher_schedule') || '[]');
 
       /* Helper to render avatar picture (Emoji OR Image URL) */
       function renderAvatarElement(container, avatarValue) {
@@ -850,6 +950,104 @@
         localStorage.setItem('ai_teacher_theme', theme);
         themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
         showToast('Switched to ' + theme + ' theme', 'info');
+      });
+
+      /* Timetable Logic */
+      function renderTimetable() {
+        if (!timetableGridContainer) return;
+        timetableGridContainer.innerHTML = '';
+
+        var days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        days.forEach(function (day) {
+          var dayCard = document.createElement('div');
+          dayCard.className = 'day-card';
+          var header = document.createElement('h4');
+          header.className = 'day-card-header';
+          header.textContent = day;
+          dayCard.appendChild(header);
+
+          var daySlots = userSchedule.filter(function (s) { return s.day === day; });
+          if (daySlots.length === 0) {
+            var emptyText = document.createElement('p');
+            emptyText.className = 'muted';
+            emptyText.style.fontSize = '0.78rem';
+            emptyText.textContent = 'No slots scheduled.';
+            dayCard.appendChild(emptyText);
+          } else {
+            daySlots.forEach(function (slot) {
+              var slotDiv = document.createElement('div');
+              slotDiv.className = 'schedule-slot';
+              slotDiv.innerHTML = '<strong>' + escapeHtml(slot.topic) + '</strong><div class="muted" style="font-size:0.75rem">' + escapeHtml(slot.timeBlock) + ' · ' + escapeHtml(slot.duration) + '</div>';
+
+              var launchBtn = document.createElement('button');
+              launchBtn.type = 'button';
+              launchBtn.className = 'slot-start-btn';
+              launchBtn.textContent = 'Start Session 🚀';
+              launchBtn.onclick = function () {
+                document.getElementById('topic').value = slot.topic;
+                document.getElementById('availableTime').value = slot.duration;
+                timetableDashboard.classList.add('hidden');
+                wizardScreen.classList.remove('hidden');
+                btnGoToStep2.click();
+                showToast('Pre-filled scheduled slot: ' + slot.topic, 'info');
+              };
+              slotDiv.appendChild(launchBtn);
+              dayCard.appendChild(slotDiv);
+            });
+          }
+          timetableGridContainer.appendChild(dayCard);
+        });
+      }
+
+      btnTimetable.addEventListener('click', function () {
+        if (!currentUser) return;
+        wizardScreen.classList.add('hidden');
+        document.getElementById('teachingScreen').classList.add('hidden');
+        document.getElementById('reportScreen').classList.add('hidden');
+        document.getElementById('progressDashboard').classList.add('hidden');
+        timetableDashboard.classList.remove('hidden');
+        renderTimetable();
+      });
+
+      btnTimetableBack.addEventListener('click', function () {
+        timetableDashboard.classList.add('hidden');
+        wizardScreen.classList.remove('hidden');
+      });
+
+      btnOpenAddSlotModal.addEventListener('click', function () {
+        addSlotModal.classList.remove('hidden');
+      });
+
+      closeSlotModal.addEventListener('click', function () {
+        addSlotModal.classList.add('hidden');
+      });
+
+      addSlotForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var day = document.getElementById('slotDay').value;
+        var timeBlock = document.getElementById('slotTimeBlock').value;
+        var topic = document.getElementById('slotTopic').value.trim();
+        var duration = document.getElementById('slotDuration').value;
+
+        if (!topic) return;
+
+        userSchedule.push({ day: day, timeBlock: timeBlock, topic: topic, duration: duration });
+        localStorage.setItem('ai_teacher_schedule', JSON.stringify(userSchedule));
+        addSlotModal.classList.add('hidden');
+        renderTimetable();
+        showToast('Study slot added for ' + day + '!', 'success');
+      });
+
+      btnAutoGenerateTimetable.addEventListener('click', function () {
+        userSchedule = [
+          { day: 'Monday', timeBlock: 'Morning', topic: "Newton's Laws of Motion", duration: '20 minutes' },
+          { day: 'Wednesday', timeBlock: 'Afternoon', topic: 'DNA Structure & Replication', duration: '30 minutes' },
+          { day: 'Friday', timeBlock: 'Evening', topic: 'Python Recursion & Stack Flow', duration: '20 minutes' },
+          { day: 'Saturday', timeBlock: 'Morning', topic: 'Pythagorean Theorem & Geometry', duration: '15 minutes' }
+        ];
+        localStorage.setItem('ai_teacher_schedule', JSON.stringify(userSchedule));
+        renderTimetable();
+        showToast('Generated optimized AI Revision Schedule!', 'success');
       });
 
       /* Auth Tab Switching */
@@ -1072,6 +1270,7 @@
           renderAvatarElement(userAvatarIcon, currentUser.profilePic || '🧑‍🎓');
 
           userBadge.classList.remove('hidden');
+          btnTimetable.classList.remove('hidden');
           btnMyProgress.classList.remove('hidden');
           btnLogOut.classList.remove('hidden');
         } else {
@@ -1079,8 +1278,10 @@
           wizardScreen.classList.add('hidden');
           document.getElementById('teachingScreen').classList.add('hidden');
           document.getElementById('progressDashboard').classList.add('hidden');
+          document.getElementById('timetableDashboard').classList.add('hidden');
           document.getElementById('reportScreen').classList.add('hidden');
           userBadge.classList.add('hidden');
+          btnTimetable.classList.add('hidden');
           btnMyProgress.classList.add('hidden');
           btnLogOut.classList.add('hidden');
         }
@@ -1192,6 +1393,7 @@
         if (!currentUser) return;
         document.getElementById('wizardScreen').classList.add('hidden');
         document.getElementById('teachingScreen').classList.add('hidden');
+        document.getElementById('timetableDashboard').classList.add('hidden');
         document.getElementById('reportScreen').classList.add('hidden');
         if (window.AiTeacherProgress) {
           window.AiTeacherProgress.loadProgress(currentUser.name);
@@ -1348,6 +1550,13 @@
           startBtn.textContent = 'Start Personalized Lesson 🚀';
         }
       });
+
+      /* Helper utility */
+      function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
 
       /* Init theme and auth */
       initTheme();

@@ -246,8 +246,99 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   4. Auto-Save Session Recovery & Toast Notifications
+   4. Timetable Dashboard & Schedule Grid
    -------------------------------------------------------------------------- */
+.timetable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.timetable-actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.timetable-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.day-card {
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-card-header {
+  font-size: var(--fs-small);
+  font-weight: 800;
+  color: var(--brand-2);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+
+.schedule-slot {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(124, 108, 255, 0.1);
+  border: 1px solid rgba(124, 108, 255, 0.25);
+  font-size: var(--fs-small);
+}
+
+.slot-start-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--brand-2);
+  color: #070b16;
+  font-weight: 800;
+  font-size: 0.72rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.slot-start-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* Leaderboard Styling */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(49, 208, 255, 0.08);
+  border: 1px solid rgba(49, 208, 255, 0.25);
+  font-size: var(--fs-small);
+  font-weight: 700;
+}
+
+.leaderboard-rank { font-weight: 800; color: var(--warn); font-size: 1.1rem; }
+.leaderboard-avatar { font-size: 1.3rem; }
+.leaderboard-name { flex: 1; color: var(--ink-1); }
+.leaderboard-score { color: var(--ok); }
+
+/* Auto-Save Session Recovery & Toast Notifications */
 .resume-banner {
   display: flex;
   align-items: center;
@@ -965,7 +1056,7 @@ a:hover {
 
 /* Option Cards for MCQs */
 .option-list {
-  display: grid;
+  display.grid;
   gap: 8px;
   margin-block: 8px;
 }
