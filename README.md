@@ -1,132 +1,127 @@
-# 🎓 AI Teacher — Autonomous Multimodal Pedagogical Engine
+# 🎓 AI Teacher — Personalized Multimodal AI Learning Platform
 
-An AI teaching platform that is **driven entirely by real user input** — no demo content, no hardcoded lessons, no fake scores.
+An AI teaching platform designed to provide a human-like, adaptive pedagogical experience — driven by real user profile data, document extraction (PDF / TXT / PPT / PPTX), and generative AI models.
 
-The student enters a profile (name, education level, language, teaching style, objective, prior knowledge, available study time, desired depth), picks **any topic** or uploads learning material (PDF / TXT / PPT / PPTX), and the AI Teacher:
-
-**Plans → Explains → Demonstrates → Asks → Evaluates → Detects misconceptions → Adapts → Re-teaches → Assesses → Reports → Tracks progress**
-
-and the whole presentation can be **recorded and downloaded** in the browser.
+The system accepts any **topic** or **uploaded study document**, creates a structured lesson, narrates content with AI voice & animated avatars, asks interactive section questions, detects student misconceptions, re-explains adaptively, generates final assessments, produces printable learning reports with concept roadmaps, and saves student history in a persistent database.
 
 ---
 
-## ✨ Feature Status
+## ✨ Key Features & MVP Architecture
 
-| Feature | Status | Notes |
+### 🔑 1. Student Authentication & Profile Management
+- **Email & Password Auth:** Full registration (`POST /api/auth/register`) and sign-in (`POST /api/auth/login`) with accounts persisted in H2 Database.
+- **In-App Profile & Avatar Settings:** Edit full name, reset/overwrite password, pick from preset avatars (`🧑‍🎓`, `👨‍🎓`, `👩‍🎓`, `⚡`, `🚀`, `🧠`), or upload a custom image file (automatically compressed via canvas thumbnail scaling to Data URL).
+
+### 🧙‍♂️ 2. 2-Step Personalized Learning Wizard
+- **Step 1 (Student Profile):** Educational Level, Preferred Language (English / Hindi / Kannada), Teaching Style (Simple Explanation, Visual, Example-Based, Step-by-Step).
+- **Step 2 (Learning Content & Goals):**
+  - **⚡ 1-Click Quick-Demo Sample Chips:** Instant topic fills for `⚡ Newton's Laws`, `🧬 DNA Replication`, `💻 Python Recursion`, `📐 Pythagoras Theorem`.
+  - Custom topic input OR document file upload.
+  - Learning Objective, Available Study Time (10m, 20m, 30m, 45m), Desired Depth, and Prior Knowledge.
+
+### 📄 3. Document Extraction & RAG Pipeline
+- **File Text Extraction:** Extracts readable content from PDF (PDFBox), PPT/PPTX (Apache POI), and plain text files.
+- **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts with relevant document excerpts.
+
+### 🧑‍🏫 4. AI Teacher Stage & Voice Narration
+- **Live Avatar Visual Status:** Live badge indicating AI state (`Listening`, `Thinking...`, `Teaching`, `Evaluating`).
+- **Web Speech Synthesis (TTS):** Browser-native speech synthesis mapped to `en-IN`, `hi-IN`, and `kn-IN` with rate controls (0.8x, 1.0x, 1.2x) and word boundary subtitle synchronization.
+- **Subject-Specific Visual Cards:** Decorative animated motifs for Math (`equation`), Processes (`process`), Code (`code`), Timelines (`timeline`), and Diagrams (`diagram`).
+
+### 🧠 5. Interactive Section Q&A & Adaptive Re-Teaching
+- **Dynamic Questions:** MCQ and short-answer questions generated per section.
+- **Misconception Detection:** Semantic analysis categorizing understanding levels (`UNDERSTOOD`, `PARTIALLY_UNDERSTOOD`, `MISCONCEPTION`, `NOT_UNDERSTOOD`).
+- **Adaptive Re-Teaching:** Generates simplified explanations, alternative examples, and follow-up checks (up to 2 adaptation cycles per section).
+
+### 📝 6. Assessment, Printable Report & Concept Roadmap
+- **Final Quiz & Grading:** 5-question comprehensive assessment.
+- **Interactive Score Circle:** Dynamic score badge (% correct) with strength/weakness analysis and recommended revision.
+- **🖨️ Printable Learning Report:** `Print / Save Report` trigger (`window.print()`) for physical/PDF export.
+- **🗺️ Concept Learning Path Roadmap:** Structured step-by-step topic progression map.
+
+### 🎥 7. Lesson Video Recording & Download
+- **MediaRecorder API:** Captures 30 FPS composite canvas rendering of avatar, subtitles, progress bar, and visual stage into downloadable `.webm`/`.mp4` video files.
+
+### 📊 8. Personal History & Progress Dashboard
+- **Session Tracking:** Tracks completed sessions, scores, weak areas, and question logs per student in file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`).
+
+### 🎨 9. UI/UX Polish & Arrow Navigation
+- **🌙 / ☀️ Light & Dark Theme Toggle:** Instant client-side theme switching.
+- **🔔 Floating Toast Notifications:** Real-time feedback alerts.
+- **🏹 Arrow Mark Navigation:** Clear `← Back` and `Next →` navigation across all screens.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Java 17+**
+- **Maven** (wrapper included)
+
+### Running the Application
+
+In PowerShell:
+```powershell
+# Set your AI API Key (Gemini or OpenAI compatible)
+$env:AI_API_KEY="your_api_key_here"
+$env:AI_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai/"
+$env:AI_MODEL="gemini-2.5-flash"
+
+cmd /c mvnw.cmd spring-boot:run
+```
+
+In Command Prompt (`cmd.exe`):
+```cmd
+set AI_API_KEY=your_api_key_here
+cmd /c mvnw.cmd spring-boot:run
+```
+
+Open browser at: **[http://localhost:8080](http://localhost:8080)**
+
+---
+
+## ⚙️ Environment Configuration
+
+| Variable | Default | Description |
 |---|---|---|
-| Student profile (name, level, language, style, objective) | ✅ | Every value reaches the AI prompt |
-| Personalization (prior knowledge, study time, desired depth) | ✅ | All three optional fields reach the lesson/question/assessment prompts and change the generated lesson |
-| Any-topic lesson generation | ✅ | Arbitrary user topics, no topic-specific logic |
-| Uploaded-material learning (PDF/TXT/PPT/PPTX) | ✅ | Real text extraction via Apache Tika/PDFBox/POI; material is the primary AI source |
-| RAG / material grounding | ✅ | Chunk → embed (local, offline) → vector store → similarity retrieval; the most relevant excerpts ground the lesson prompt instead of blind truncation |
-| AI lesson planning (title, intro, objectives, sections, examples) | ✅ | Structured, validated JSON from the AI provider |
-| Personalization (level, style, objective, language, time estimate) | ✅ | Applied in the generation prompt |
-| Teacher presentation (avatar, sections, progress, navigation) | ✅ | Dynamic content, responsive layout |
-| Avatar states (IDLE / SPEAKING / PAUSED / TRANSITIONING) | ✅ | CSS/Canvas animation tied to real state |
-| Subject-aware visuals | ⚠️ | Decorative animated motifs keyed to each section's `visualHint` (equation, process, timeline, code, diagram); they do **not** invent facts |
-| Voice narration (English / Hindi / Kannada) | ✅ | Web Speech API, locale mapping `en-IN` / `hi-IN` / `kn-IN`, play/pause/resume/stop/speed, subtitles |
-| Multilingual teaching content | ✅ | Lesson, questions, feedback, adaptation and report are generated in the selected language |
-| Interactive questions (MCQ + short answer) | ✅ | Generated from the actual lesson section |
-| Answer evaluation | ✅ | MCQ exact-match; short answers semantically evaluated by AI |
-| Misconception detection | ✅ | UNDERSTOOD / PARTIAL / MISCONCEPTION / NOT_UNDERSTOOD with severity and recommended approach |
-| Adaptive re-teaching | ✅ | Different explanation + example + follow-up question, attempt limit prevents infinite retries |
-| Final assessment | ✅ | Dynamically generated, scored, weak areas + revision plan + next topic |
-| Learning report | ✅ | Score %, concepts understood, weak areas, incorrect concepts, revision, next topic |
-| Progress dashboard / history | ✅ | Real sessions only; proper empty state, no fake records |
-| **Video recording + download** | ✅ | Browser-native MediaRecorder + composite canvas of the real lesson; preview, download (WebM/MP4 by browser support), dynamic filename |
-| Error handling | ✅ | User-safe messages; no silent failures; proper HTTP status codes |
-| Security | ✅ | API key stays server-side; upload validation + size limit + executable-content sniffing; no stack traces leaked |
+| `AI_API_KEY` | *(none)* | Secret key for AI provider (Server-side only). |
+| `AI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible completions endpoint. |
+| `AI_MODEL` | `gpt-4o-mini` | AI Model ID (e.g., `gemini-2.5-flash`, `gpt-4o-mini`). |
+| `AI_TIMEOUT_SECONDS` | `90` | Request timeout in seconds. |
 
 ---
 
-## 🚀 Run
+## 🔌 API Overview
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Register new student account |
+| POST | `/api/auth/login` | Sign in student with Email + Password |
+| POST | `/api/auth/profile/update` | Update name, avatar profile pic, or reset password |
+| POST | `/api/profile` | Validate student profile |
+| POST | `/api/material/upload` | Multipart upload & text extraction (PDF/TXT/PPT/PPTX) |
+| POST | `/api/lesson/plan` | Generate personalized lesson plan |
+| POST | `/api/lesson/question` | Generate interactive section check question |
+| POST | `/api/lesson/evaluate` | Evaluate student answer |
+| POST | `/api/lesson/misconception` | Detect misconception & understanding level |
+| POST | `/api/lesson/adapt` | Generate adaptive re-teaching & follow-up check |
+| POST | `/api/assessment/generate` | Generate final assessment |
+| POST | `/api/assessment/submit` | Grade assessment & generate learning report |
+| POST | `/api/progress` | Save completed learning session |
+| GET | `/api/progress/summary?studentName=…` | Fetch student history & progress metrics |
+
+---
+
+## 🧪 Testing
+
+Run the full automated test suite (185 unit & integration tests):
 
 ```bash
-mvnw spring-boot:run
+cmd /c mvnw.cmd test
 ```
 
-Open **http://localhost:8080** — a student profile form is the starting point.
-
-> ⚠️ The app needs a real AI provider to teach. Without one, the UI shows a clear
-> "AI service is currently unavailable" style message instead of fabricating content.
-
-### AI configuration (environment variables)
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `AI_API_KEY` | *(none)* | Bearer token for the AI provider. **Never exposed to the browser.** |
-| `AI_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible chat-completions base URL (OpenAI, Groq, OpenRouter, DeepSeek, Ollama, …) |
-| `AI_MODEL` | `gpt-4o-mini` | Model identifier |
-| `AI_TIMEOUT_SECONDS` | `90` | Provider read timeout |
-
-Example:
+Build production JAR package:
 
 ```bash
-export AI_API_KEY=sk-...    # macOS/Linux
-set AI_API_KEY=sk-...       # Windows cmd
+cmd /c mvnw.cmd clean package -DskipTests
 ```
-
----
-
-## 🗂 Project Structure
-
-```
-src/main/java/com/aiteacher/
-├── ai/            AiChatClient transport (OpenAI-compatible), typed AiException
-├── controller/    REST endpoints (profile, lesson plan, interaction, assessment, upload, progress)
-├── dto/           Request/response DTOs
-├── entity/        JPA entity (LearningSession)
-├── extraction/    PDF / TXT / PPT / PPTX text extraction
-├── rag/           Chunking, local hash embeddings, in-memory vector store, retrieval service
-├── repository/    Spring Data JPA repository
-└── service/       AI lesson, question, evaluation, misconception, adaptation, assessment, progress
-
-src/main/resources/
-├── static/        index.html + css/ + js/ (speech, recording, teaching, assessment, progress)
-└── application.yml
-```
-
-The frontend is a single-page app (vanilla HTML/CSS/JS) with screens for profile → teaching → assessment → report → dashboard.
-
----
-
-## 🔌 API
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/profile` | Validate the student profile |
-| POST | `/api/material/upload` | Multipart upload: extract text from PDF/TXT/PPT/PPTX |
-| POST | `/api/lesson/plan` | Generate the personalized lesson plan |
-| POST | `/api/lesson/question` | Generate a question from the current section |
-| POST | `/api/lesson/evaluate` | Evaluate the student's answer |
-| POST | `/api/lesson/misconception` | Detect misconception / understanding level |
-| POST | `/api/lesson/adapt` | Generate adaptive re-teaching + follow-up question |
-| POST | `/api/assessment/generate` | Generate the final assessment from the lesson |
-| POST | `/api/assessment/submit` | Grade answers and build the learning report |
-| POST | `/api/progress` | Save a completed learning session |
-| GET | `/api/progress?studentName=…` | Learning history |
-| GET | `/api/progress/summary?studentName=…` | Progress summary (strengths, weak areas, next topic) |
-
-H2 console (dev): http://localhost:8080/h2-console — JDBC URL `jdbc:h2:file:./data/aiteacherdb`, user `sa`, empty password. Progress is stored in a file-backed H2 database (`./data/`) so it **survives application restarts**. Only one app instance may run at a time (stop the previous one first).
-
----
-
-## 🧪 Tests
-
-```bash
-mvnw clean test
-mvnw clean package
-```
-
-The suite (185 tests) covers controllers, AI prompt construction/validation for every AI service, the RAG pipeline (chunking, embeddings, retrieval ranking), document extraction (real PDF/PPT/PPTX/TXT bytes, corrupt/oversized/executable rejections), and progress persistence — all with a fake transport, so no network or API key is needed. Integration tests run against an in-memory H2 so they never touch your real progress file.
-
----
-
-## ⚠️ Honest Limitations
-
-- **Recording is visual-only.** MediaRecorder cannot capture Web Speech synthesis audio, so the recorded video contains the teacher avatar, lesson visuals and subtitles — **not** narration audio. The app says so explicitly and never fakes audio. Video files are WebM in most browsers (MP4 when the browser supports it), named `ai-teacher_<topic>_<timestamp>.<ext>`.
-- **AI teaching requires a configured provider.** With no `AI_API_KEY`, the app refuses politely rather than generating fake content.
-- **Progress is stored in a file-backed H2 database** (`jdbc:h2:file:./data/aiteacherdb`) and survives restarts. Only one app instance may run at a time. Delete the `./data/` folder to reset progress.
-- **Speech and recording depend on the browser/OS** (Web Speech voices, `MediaRecorder`/`captureStream` support). Unsupported browsers get clear messages and the rest of the app keeps working.
-- **Teaching visuals are decorative motifs** keyed to the lesson's visual hint — a lightweight, honest visual treatment rather than invented subject facts.
-- **RAG uses offline local embeddings** (deterministic hashing, no model/API). It is a hackathon-grade lexical/semantic-hybrid retriever — strong on topical overlap, not a learned model.
