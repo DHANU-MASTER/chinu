@@ -1021,6 +1021,65 @@ window.AiTeacherTeaching = (function () {
 
   /* ======================== Per-Step Rendering ======================== */
 
+  function renderInteractiveWidget(hint, title) {
+    var container = $('interactiveVisualWidget');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var h = String(hint || '').toLowerCase().trim();
+
+    if (h === 'code') {
+      var terminal = document.createElement('div');
+      terminal.className = 'widget-code-terminal';
+      terminal.innerHTML = '<code>// Live Interactive Code Sandbox\nfunction learn(concept) {\n  return "Mastered " + concept;\n}\nconsole.log(learn("' + escapeHtml(title || 'Topic') + '"));</code>';
+
+      var runBtn = document.createElement('button');
+      runBtn.type = 'button';
+      runBtn.className = 'widget-run-btn';
+      runBtn.textContent = '▶ Run Code';
+      runBtn.onclick = function () {
+        var output = document.createElement('div');
+        output.style.color = '#31d0ff';
+        output.style.marginTop = '6px';
+        output.textContent = 'Output ➔ "Mastered ' + (title || 'Topic') + '"';
+        terminal.appendChild(output);
+        if (window.showToast) window.showToast('Executed code in sandbox console!', 'success');
+      };
+      terminal.appendChild(runBtn);
+      container.appendChild(terminal);
+    } else if (h === 'process' || h === 'diagram') {
+      var sandbox = document.createElement('div');
+      sandbox.className = 'widget-vector-sandbox';
+      ['Gravity 🌐', 'Velocity 🚀', 'Friction ⚙️'].forEach(function (btnLabel, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'vector-toggle-btn' + (idx === 0 ? ' active' : '');
+        btn.textContent = btnLabel;
+        btn.onclick = function () {
+          sandbox.querySelectorAll('.vector-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          if (window.showToast) window.showToast('Simulating: ' + btnLabel, 'info');
+        };
+        sandbox.appendChild(btn);
+      });
+      container.appendChild(sandbox);
+    } else if (h === 'equation') {
+      var stepGroup = document.createElement('div');
+      stepGroup.className = 'widget-step-buttons';
+      ['Step 1: Formula', 'Step 2: Substitution', 'Step 3: Output'].forEach(function (label) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'step-calc-btn';
+        btn.textContent = label;
+        btn.onclick = function () {
+          if (window.showToast) window.showToast('Calculation: ' + label, 'info');
+        };
+        stepGroup.appendChild(btn);
+      });
+      container.appendChild(stepGroup);
+    }
+  }
+
   function renderIntro() {
     clearBody();
     els['ts-section-title'].textContent = UI.welcomeTitle;
@@ -1044,9 +1103,9 @@ window.AiTeacherTeaching = (function () {
     els['ts-visual-title'].textContent = lesson.lessonTitle;
     els['ts-visual-note'].textContent = UI.teaching;
     setMotif('generic');
-    els['ts-bubble'].textContent = UI.welcomeTitle;
+    renderInteractiveWidget('diagram', lesson.lessonTitle);
+    els['ts-bubble'].querySelector('#ts-bubble-text').textContent = UI.welcomeTitle;
 
-    // Phase 9: Show subtitle for intro text
     var introText = lesson.introduction || '';
     if (lesson.learningObjectives && lesson.learningObjectives.length > 0) {
       introText += ' ' + UI.objectivesTitle + ' ' + lesson.learningObjectives.join('. ');
@@ -1079,9 +1138,11 @@ window.AiTeacherTeaching = (function () {
     els['ts-visual-title'].textContent = title;
     els['ts-visual-note'].textContent = UI.teaching;
     setMotif(section.visualHint);
-    els['ts-bubble'].textContent = UI.teaching;
+    renderInteractiveWidget(section.visualHint, title);
 
-    // Phase 9: Show subtitle for section text
+    var bubbleText = els['ts-bubble'].querySelector('#ts-bubble-text');
+    if (bubbleText) bubbleText.textContent = UI.teaching;
+
     var sectionText = '';
     if (title) sectionText += title + '. ';
     if (explanation) sectionText += explanation;

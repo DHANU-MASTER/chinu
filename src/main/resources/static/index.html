@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0d1428" />
-  <title>AI Teacher — Personalized Multimodal AI Learning Platform</title>
+  <title>AI Teacher — Autonomous Multimodal Pedagogical Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🏫</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -12,6 +12,13 @@
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Auto-Save Session Recovery Banner -->
+  <div id="resumeSessionBanner" class="resume-banner hidden">
+    <span>↺ An in-progress lesson session was found!</span>
+    <button id="btnResumeSession" class="btn btn-sm btn-primary" type="button">Resume Lesson 🚀</button>
+    <button id="btnDismissSession" class="btn btn-sm btn-ghost" type="button">Dismiss</button>
+  </div>
 
   <!-- Profile Settings & Password Reset Modal -->
   <div id="profileModal" class="modal-backdrop hidden">
@@ -181,19 +188,19 @@
       </section>
 
       <!-- ==================== 2-STEP PERSONALIZED WIZARD ==================== -->
-      <section id="wizardScreen" class="card card-pad stack hidden wizard-screen" style="max-width: 600px; margin-inline: auto">
+      <section id="wizardScreen" class="card card-pad stack hidden wizard-screen" style="max-width: 660px; margin-inline: auto">
         <div class="wizard-header stack-sm text-center">
           <div class="wizard-top-nav">
             <button id="btnWizardBackToAuth" class="btn btn-ghost btn-sm" type="button">← Back to Log In</button>
           </div>
 
           <h1 style="font-size: var(--fs-2); margin-top: 8px;" id="wizardMainTitle">Set Up Your Personalized Lesson</h1>
-          <p class="muted" id="wizardSubtitle">Customize your teacher persona and topic</p>
+          <p class="muted" id="wizardSubtitle">Select your AI Teacher Persona &amp; learning goals</p>
 
           <div class="wizard-progress-bar">
             <div class="wizard-step-indicator active" id="stepIndicator1">
               <span class="step-num">1</span>
-              <span class="step-label">Student Profile</span>
+              <span class="step-label">Teacher &amp; Profile</span>
             </div>
             <div class="wizard-step-line"></div>
             <div class="wizard-step-indicator" id="stepIndicator2">
@@ -205,34 +212,75 @@
 
         <form id="profileForm" novalidate>
 
-          <!-- STEP 1: Student Profile -->
+          <!-- STEP 1: Student Profile & Anime 3D Teacher Persona Selection -->
           <div id="wizardStep1" class="wizard-step-content stack">
+
+            <div class="field">
+              <label>Select Your Anime 3D AI Teacher Persona *</label>
+              <div class="persona-cards-grid">
+                <!-- Chopper -->
+                <div class="persona-card active aura-blue" data-persona="chopper" data-name="Chopper" data-quote="I'll cure your misunderstandings with science! 🌸">
+                  <div class="persona-aura"></div>
+                  <div class="persona-avatar-icon">🧪</div>
+                  <h4 class="persona-title">Chopper</h4>
+                  <p class="persona-role">Kind Doctor</p>
+                  <p class="persona-desc">Step-by-step, analytical &amp; caring doctor explanations.</p>
+                  <span class="persona-badge">Blue Sakura Aura</span>
+                </div>
+
+                <!-- Red-Haired Shanks -->
+                <div class="persona-card aura-red" data-persona="shanks" data-name="Red-Haired Shanks" data-quote="Prepare yourself for an inspiring lesson! ⚡">
+                  <div class="persona-aura"></div>
+                  <div class="persona-avatar-icon">🏴‍☠️</div>
+                  <h4 class="persona-title">Shanks</h4>
+                  <p class="persona-role">Inspiring Captain</p>
+                  <p class="persona-desc">High-energy, bold &amp; motivating real-world examples.</p>
+                  <span class="persona-badge">Red Haki Aura</span>
+                </div>
+
+                <!-- Lucky Roux -->
+                <div class="persona-card aura-green" data-persona="lucky_roux" data-name="Lucky Roux" data-quote="Let's gobble up this concept in no time! ✨">
+                  <div class="persona-aura"></div>
+                  <div class="persona-avatar-icon">🍗</div>
+                  <h4 class="persona-title">Lucky Roux</h4>
+                  <p class="persona-role">Quick Specialist</p>
+                  <p class="persona-desc">Fast, fun, approachable &amp; algorithmic breakdowns.</p>
+                  <span class="persona-badge">Green Energy Aura</span>
+                </div>
+              </div>
+
+              <input type="hidden" id="selectedPersona" value="chopper" />
+              <p id="personaCatchphraseDisplay" class="persona-quote-banner">"I'll cure your misunderstandings with science! 🌸"</p>
+            </div>
+
             <div class="field">
               <label for="name">Student Name *</label>
               <input class="input" id="name" name="name" type="text" autocomplete="name"
                      placeholder="Enter your name" required maxlength="80" />
             </div>
 
-            <div class="field">
-              <label for="educationLevel">Educational Level *</label>
-              <select class="select" id="educationLevel" name="educationLevel" required>
-                <option value="" disabled selected>Select your level…</option>
-                <option value="School">School</option>
-                <option value="High School">High School</option>
-                <option value="College">College</option>
-                <option value="University">University</option>
-                <option value="Professional">Professional</option>
-              </select>
-            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="educationLevel">Educational Level *</label>
+                <select class="select" id="educationLevel" name="educationLevel" required>
+                  <option value="" disabled selected>Select your level…</option>
+                  <option value="School">School</option>
+                  <option value="High School">High School</option>
+                  <option value="College">College</option>
+                  <option value="University">University</option>
+                  <option value="Professional">Professional</option>
+                </select>
+              </div>
 
-            <div class="field">
-              <label for="language">Preferred Language *</label>
-              <select class="select" id="language" name="language" required>
-                <option value="" disabled selected>Select a language…</option>
-                <option value="English">English</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Kannada">Kannada</option>
-              </select>
+              <div class="field">
+                <label for="language">Preferred Language *</label>
+                <select class="select" id="language" name="language" required>
+                  <option value="" disabled selected>Select a language…</option>
+                  <option value="English">English</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Kannada">Kannada</option>
+                </select>
+              </div>
             </div>
 
             <div class="field">
@@ -334,11 +382,15 @@
       </section>
 
       <!-- ==================== TEACHING SCREEN ==================== -->
-      <section id="teachingScreen" class="card card-pad stack hidden teaching-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+      <section id="teachingScreen" class="card card-pad stack hidden teaching-screen" style="max-width: 880px; margin-inline: auto" aria-live="polite">
         <div class="teach-header">
           <div class="teach-header-info">
             <h2 id="ts-title" style="margin: 0"></h2>
             <p class="muted" id="ts-meta" style="margin: 0"></p>
+            <div id="ragConfidenceBadge" class="rag-confidence-badge hidden">
+              <span class="rag-dot"></span>
+              <span id="ragConfidenceText">🎯 98% Document Grounded (RAG)</span>
+            </div>
           </div>
           <div class="teach-progress">
             <span class="muted" id="ts-progress-label"></span>
@@ -347,12 +399,15 @@
         </div>
 
         <div class="teach-stage" id="ts-stage">
-          <div class="teach-avatar" id="ts-avatar" data-state="idle" aria-label="AI Teacher avatar">
+          <div class="teach-avatar aura-blue" id="ts-avatar" data-state="idle" aria-label="AI Teacher avatar">
             <div class="avatar-status-badge" id="avatarStatusBadge">
               <span class="status-dot"></span>
               <span id="avatarStatusText">Teaching</span>
             </div>
-            <div class="speech-bubble" id="ts-bubble">Teaching…</div>
+            <div class="speech-bubble" id="ts-bubble">
+              <span id="ts-bubble-text">Teaching…</span>
+              <span id="ts-bubble-particles" class="bubble-particles">🌸</span>
+            </div>
             <svg class="teacher-figure" viewBox="0 0 120 140" aria-hidden="true">
               <circle cx="60" cy="36" r="22" fill="#31d0ff" />
               <circle cx="52" cy="32" r="3" fill="#0d1428" />
@@ -363,10 +418,12 @@
             </svg>
           </div>
 
+          <!-- 3D Interactive Stage Visual Playground -->
           <div class="teach-visual" id="ts-visual">
             <div class="visual-motif" id="ts-motif"></div>
             <div class="visual-title" id="ts-visual-title"></div>
             <div class="visual-note" id="ts-visual-note">Teaching…</div>
+            <div id="interactiveVisualWidget" class="interactive-visual-widget"></div>
           </div>
         </div>
 
@@ -476,10 +533,10 @@
         <button class="btn btn-ghost btn-block" id="ts-edit" type="button">← Back to Lesson Setup</button>
       </section>
 
-      <!-- Lesson Video Recording Screen -->
+      <!-- Lesson Video & Live Audio Recording Screen -->
       <section id="recordingScreen" class="card card-pad stack hidden recording-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
         <div class="recording-header">
-          <h2 style="margin: 0">🎥 Record This Lesson</h2>
+          <h2 style="margin: 0">🎥 Record This Lesson (Video + Microphone Audio)</h2>
           <span class="recording-timer" id="rec-timer" aria-live="off">00:00</span>
         </div>
         <p class="muted" id="rec-status" role="status"></p>
@@ -494,14 +551,14 @@
         <p class="muted rec-file-name" id="rec-file-name"></p>
 
         <div class="recording-controls">
-          <button class="btn btn-primary" id="rec-start" type="button">🎥 Start Recording</button>
+          <button class="btn btn-primary" id="rec-start" type="button">🎥 Start Audio + Video Recording</button>
           <button class="btn btn-ghost" id="rec-pause" type="button" disabled>⏸ Pause</button>
           <button class="btn btn-ghost" id="rec-stop" type="button" disabled>⏹ Stop</button>
           <button class="btn btn-ghost" id="rec-again" type="button" disabled>↺ Record Again</button>
-          <button class="btn btn-ghost btn-download" id="rec-download" type="button" disabled>⬇ Download Video</button>
+          <button class="btn btn-ghost btn-download" id="rec-download" type="button" disabled>⬇ Download Recorded Video</button>
         </div>
 
-        <p class="muted rec-note" id="rec-note">Records teacher presentation, subtitles, and visual stage to video format.</p>
+        <p class="muted rec-note" id="rec-note">Captures teacher presentation canvas and live microphone audio narration into WebM/MP4 format.</p>
         <p id="rec-unsupported" class="muted hidden" role="alert" style="color: var(--bad)"></p>
       </section>
 
@@ -540,7 +597,7 @@
       <section id="reportScreen" class="card card-pad stack hidden report-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
         <div class="report-header">
           <h2>Your Personalized Learning Report</h2>
-          <button class="btn btn-ghost btn-sm" id="reportPrintBtn" type="button">🖨️ Print / Save Report</button>
+          <button class="btn btn-ghost btn-sm" id="reportPrintBtn" type="button">📄 Download PDF Report</button>
         </div>
 
         <div id="report-loading" class="question-loading">
@@ -557,6 +614,17 @@
             <div class="score-details">
               <p id="report-score-text" class="score-text"></p>
               <p id="report-summary" class="report-summary muted"></p>
+
+              <!-- Student Mastery Haki Power Meter -->
+              <div class="power-meter-container">
+                <div class="power-meter-label">
+                  <span>Student Haki Mastery Rank:</span>
+                  <span id="powerMeterRank" class="power-rank-badge">Supreme Haki Master</span>
+                </div>
+                <div class="power-meter-bar-track">
+                  <div id="powerMeterBarFill" class="power-meter-bar-fill"></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -661,7 +729,7 @@
 
           <!-- Next Topic -->
           <div id="progress-next-topic" class="progress-section">
-            <h3 class="progress-section-title">🚀 Recommended Next Topic</h3>
+            <h3 class="report-section-title">🚀 Recommended Next Topic</h3>
             <p id="progress-next-topic-text" class="progress-next-topic"></p>
           </div>
         </div>
@@ -697,6 +765,11 @@
       var themeToggle = document.getElementById('themeToggle');
       var themeIcon = document.getElementById('themeIcon');
       var toastContainer = document.getElementById('toastContainer');
+
+      /* Auto-Save Session Recovery */
+      var resumeSessionBanner = document.getElementById('resumeSessionBanner');
+      var btnResumeSession = document.getElementById('btnResumeSession');
+      var btnDismissSession = document.getElementById('btnDismissSession');
 
       /* Profile Modal Elements */
       var profileModal = document.getElementById('profileModal');
@@ -796,6 +869,19 @@
         registerError.classList.add('hidden');
       });
 
+      /* Persona Card Selection */
+      document.querySelectorAll('.persona-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+          document.querySelectorAll('.persona-card').forEach(function (c) { c.classList.remove('active'); });
+          card.classList.add('active');
+          var persona = card.getAttribute('data-persona');
+          var quote = card.getAttribute('data-quote');
+          document.getElementById('selectedPersona').value = persona;
+          document.getElementById('personaCatchphraseDisplay').textContent = '"' + quote + '"';
+          showToast('Selected AI Teacher Persona: ' + card.getAttribute('data-name'), 'info');
+        });
+      });
+
       /* Avatar Picker Logic */
       function setupAvatarPicker(containerId, hiddenInputId, previewDisplayId) {
         var container = document.getElementById(containerId);
@@ -865,7 +951,6 @@
         if (customAvatarFile.files && customAvatarFile.files[0]) {
           compressImageFile(customAvatarFile.files[0], 160, function (dataUrl) {
             renderAvatarElement(document.getElementById('modalAvatarPreviewContainer'), dataUrl);
-            // clear preset active state
             document.querySelectorAll('#modalAvatarPicker .avatar-opt').forEach(function(o){ o.classList.remove('active'); });
             showToast('Custom profile picture file selected!', 'info');
           });
@@ -943,10 +1028,37 @@
           localStorage.setItem('ai_teacher_user', JSON.stringify(currentUser));
           showToast('Welcome back, ' + currentUser.name + '! 👋', 'success');
           updateAuthUI();
+          checkSessionRecovery();
         } catch (err) {
           loginError.textContent = 'Unable to connect to the server.';
           loginError.classList.remove('hidden');
         }
+      });
+
+      /* Check Auto-Save Session Recovery */
+      function checkSessionRecovery() {
+        var savedPlan = localStorage.getItem('ai_teacher_saved_plan');
+        var savedProfile = localStorage.getItem('ai_teacher_saved_profile');
+        if (savedPlan && savedProfile && currentUser) {
+          resumeSessionBanner.classList.remove('hidden');
+        }
+      }
+
+      btnResumeSession.addEventListener('click', function () {
+        var savedPlan = JSON.parse(localStorage.getItem('ai_teacher_saved_plan') || 'null');
+        var savedProfile = JSON.parse(localStorage.getItem('ai_teacher_saved_profile') || 'null');
+        if (savedPlan && savedProfile) {
+          resumeSessionBanner.classList.add('hidden');
+          wizardScreen.classList.add('hidden');
+          showToast('Resumed in-progress lesson session!', 'success');
+          window.AiTeacherTeaching.render(savedPlan, savedProfile);
+        }
+      });
+
+      btnDismissSession.addEventListener('click', function () {
+        localStorage.removeItem('ai_teacher_saved_plan');
+        localStorage.removeItem('ai_teacher_saved_profile');
+        resumeSessionBanner.classList.add('hidden');
       });
 
       /* Update Auth UI */
@@ -1175,6 +1287,8 @@
       profileForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
+        var selectedPersona = document.getElementById('selectedPersona').value || 'chopper';
+
         var values = {
           name: document.getElementById('name').value.trim(),
           educationLevel: document.getElementById('educationLevel').value,
@@ -1186,7 +1300,8 @@
           availableTime: document.getElementById('availableTime').value,
           desiredDepth: document.getElementById('desiredDepth').value,
           uploadedMaterial: uploadedMaterial ? uploadedMaterial.extractedText : null,
-          profilePic: currentUser ? currentUser.profilePic : '🧑‍🎓'
+          profilePic: currentUser ? currentUser.profilePic : '🧑‍🎓',
+          persona: selectedPersona
         };
 
         if (!values.name || !values.educationLevel || !values.language || !values.teachingStyle || !values.objective ||
@@ -1218,6 +1333,11 @@
           }
 
           var plan = await planRes.json();
+
+          // Auto-save session state for recovery
+          localStorage.setItem('ai_teacher_saved_plan', JSON.stringify(plan));
+          localStorage.setItem('ai_teacher_saved_profile', JSON.stringify(values));
+
           wizardScreen.classList.add('hidden');
           showToast('Your personalized lesson is ready!', 'success');
           window.AiTeacherTeaching.render(plan, values);
@@ -1232,6 +1352,7 @@
       /* Init theme and auth */
       initTheme();
       updateAuthUI();
+      checkSessionRecovery();
     })();
   </script>
 </body>

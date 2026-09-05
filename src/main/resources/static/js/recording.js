@@ -442,8 +442,31 @@ window.AiTeacherRecorder = (function () {
   function startRecording() {
     if (recording || !els['rec-canvas']) { return; }
     try {
-      stream = els['rec-canvas'].captureStream(30);
+      var canvasStream = els['rec-canvas'].captureStream(30);
       mimeType = pickMimeType();
+
+      // Attempt to capture microphone audio track if user permits
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (audioStream) {
+          if (audioStream && audioStream.getAudioTracks().length > 0) {
+            canvasStream.addTrack(audioStream.getAudioTracks()[0]);
+          }
+          beginMediaRecorder(canvasStream);
+        }).catch(function () {
+          // Microphone permission declined/unavailable — fall back to visual canvas recording
+          beginMediaRecorder(canvasStream);
+        });
+      } else {
+        beginMediaRecorder(canvasStream);
+      }
+    } catch (err) {
+      recordingError(UI.failed + (err && err.message ? ' (' + err.message + ')' : ''));
+    }
+  }
+
+  function beginMediaRecorder(canvasStream) {
+    try {
+      stream = canvasStream;
       recorder = new MediaRecorder(stream, mimeType ? { mimeType: mimeType } : undefined);
       chunks = [];
       recorder.ondataavailable = function (e) {

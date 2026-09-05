@@ -328,6 +328,26 @@ window.AiTeacherAssessment = (function () {
     // Summary
     els['report-summary'].textContent = result.performanceSummary || '';
 
+    // Student Mastery Power Meter
+    var powerFill = $('powerMeterBarFill');
+    var powerRank = $('powerMeterRank');
+    if (powerFill && powerRank) {
+      powerFill.style.width = percentage + '%';
+      if (percentage >= 85) {
+        powerRank.textContent = '⚡ Supreme Haki Master';
+        powerRank.style.background = 'var(--ok)';
+      } else if (percentage >= 70) {
+        powerRank.textContent = '🥇 Master';
+        powerRank.style.background = 'var(--brand-2)';
+      } else if (percentage >= 50) {
+        powerRank.textContent = '🥈 Adept';
+        powerRank.style.background = 'var(--warn)';
+      } else {
+        powerRank.textContent = '🥉 Novice';
+        powerRank.style.background = 'var(--bad)';
+      }
+    }
+
     // Render Learning Path Roadmap
     var pathContainer = $('report-path-steps');
     if (pathContainer && lesson) {
