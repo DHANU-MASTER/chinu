@@ -219,7 +219,7 @@ window.AiTeacherRecorder = (function () {
 
   function drawAvatar(ctx, s, now) {
     var cx = 180;
-    var cy = 330;
+    var cy = 310;
     var pulse = 0;
     if (s.avatarState === 'teaching' || (recording && !paused)) {
       pulse = Math.sin(now / 300) * 0.035;
@@ -230,36 +230,36 @@ window.AiTeacherRecorder = (function () {
     ctx.globalAlpha = dim;
     ctx.translate(cx, cy);
 
-    // body
-    ctx.fillStyle = '#7c6cff';
-    ctx.beginPath();
-    ctx.moveTo(-88, 150);
-    ctx.quadraticCurveTo(-40, 40, 0, 40);
-    ctx.quadraticCurveTo(40, 40, 88, 150);
-    ctx.closePath();
-    ctx.fill();
+    // Aura Outer Circle Glow
+    var auraColor = '#31d0ff';
+    var personaName = 'Chopper 🧪';
 
-    // head
-    var r = 62 * (1 + pulse);
-    ctx.fillStyle = '#31d0ff';
-    ctx.beginPath();
-    ctx.arc(0, -70, r, 0, Math.PI * 2);
-    ctx.fill();
+    var personaInput = document.getElementById('selectedPersona');
+    var personaVal = personaInput ? personaInput.value : 'chopper';
 
-    // eyes
-    ctx.fillStyle = '#0d1428';
-    ctx.beginPath();
-    ctx.arc(-20, -78, 7, 0, Math.PI * 2);
-    ctx.arc(20, -78, 7, 0, Math.PI * 2);
-    ctx.fill();
+    if (personaVal === 'shanks') {
+      auraColor = '#ff6b7a';
+      personaName = 'Shanks 🏴‍☠️';
+    } else if (personaVal === 'lucky_roux') {
+      auraColor = '#2fe6a8';
+      personaName = 'Lucky Roux 🍗';
+    }
 
-    // smile
-    ctx.strokeStyle = '#0d1428';
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
+    var r = 68 * (1 + pulse);
+    ctx.fillStyle = 'rgba(13, 20, 40, 0.9)';
+    ctx.strokeStyle = auraColor;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.arc(0, -52, 24, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
+
+    // Teacher Persona Title Badge inside recording canvas
+    ctx.font = '700 20px "Segoe UI", system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(personaName, 0, 0);
 
     ctx.restore();
 

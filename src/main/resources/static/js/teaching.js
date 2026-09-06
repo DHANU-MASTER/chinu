@@ -1103,6 +1103,47 @@ window.AiTeacherTeaching = (function () {
     }
   }
 
+  function getPersonaAvatarSvg(personaVal) {
+    if (personaVal === 'shanks') {
+      return '<svg class="avatar-svg-artwork" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle cx="50" cy="50" r="46" fill="#1e1838" stroke="#ff6b7a" stroke-width="3"/>' +
+        '<path d="M 20 85 Q 50 55 80 85 L 85 100 L 15 100 Z" fill="#b81d28"/>' + // Red Cape
+        '<circle cx="50" cy="46" r="22" fill="#ffd5b2"/>' + // Face
+        '<path d="M 24 38 Q 50 18 76 38 Q 68 28 50 25 Q 32 28 24 38 Z" fill="#d92b38"/>' + // Red Hair
+        '<path d="M 20 38 Q 50 15 80 38 Q 80 44 20 44 Z" fill="#e6c280"/>' + // Straw Hat Brim
+        '<path d="M 35 26 Q 50 18 65 26 A 15 15 0 0 1 35 26 Z" fill="#cc3333"/>' + // Hat Band
+        '<circle cx="42" cy="45" r="2.5" fill="#0d1428"/>' + // Left Eye
+        '<circle cx="58" cy="45" r="2.5" fill="#0d1428"/>' + // Right Eye
+        '<line x1="60" y1="38" x2="56" y2="52" stroke="#990000" stroke-width="2"/>' + // 3 Scar Lines
+        '<line x1="63" y1="39" x2="59" y2="53" stroke="#990000" stroke-width="2"/>' +
+        '<line x1="66" y1="40" x2="62" y2="54" stroke="#990000" stroke-width="2"/>' +
+        '<path d="M 44 54 Q 50 60 56 54" stroke="#0d1428" stroke-width="2" fill="none" stroke-linecap="round"/>' + // Smile
+        '</svg>';
+    } else if (personaVal === 'lucky_roux') {
+      return '<svg class="avatar-svg-artwork" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle cx="50" cy="50" r="46" fill="#14281e" stroke="#2fe6a8" stroke-width="3"/>' +
+        '<path d="M 18 85 Q 50 50 82 85 L 85 100 L 15 100 Z" fill="#e6c229"/>' + // Yellow Coat
+        '<circle cx="50" cy="48" r="24" fill="#ffdfbf"/>' + // Face
+        '<path d="M 24 35 Q 50 20 76 35 Q 70 25 50 25 Q 30 25 24 35 Z" fill="#2fe6a8"/>' + // Green Bandana
+        '<circle cx="40" cy="44" r="5" fill="#0d1428" stroke="#ffffff" stroke-width="1.5"/>' + // Goggles L
+        '<circle cx="60" cy="44" r="5" fill="#0d1428" stroke="#ffffff" stroke-width="1.5"/>' + // Goggles R
+        '<path d="M 40 56 Q 50 64 60 56" stroke="#0d1428" stroke-width="2.5" fill="none" stroke-linecap="round"/>' + // Big Smile
+        '</svg>';
+    } else { // Chopper
+      return '<svg class="avatar-svg-artwork" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle cx="50" cy="50" r="46" fill="#142238" stroke="#31d0ff" stroke-width="3"/>' +
+        '<path d="M 22 85 Q 50 55 78 85 L 85 100 L 15 100 Z" fill="#31d0ff"/>' + // Doctor Coat
+        '<circle cx="50" cy="52" r="22" fill="#8c583c"/>' + // Fur Face
+        '<path d="M 24 40 Q 50 20 76 40 L 72 26 Q 50 18 28 26 Z" fill="#ff5ca8"/>' + // Pink Doctor Hat
+        '<path d="M 45 28 L 55 38 M 55 28 L 45 38" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>' + // White X Cross
+        '<circle cx="50" cy="52" r="4.5" fill="#31d0ff"/>' + // Blue Reindeer Nose
+        '<circle cx="41" cy="46" r="2.5" fill="#0d1428"/>' + // Eye L
+        '<circle cx="59" cy="46" r="2.5" fill="#0d1428"/>' + // Eye R
+        '<path d="M 44 58 Q 50 63 56 58" stroke="#0d1428" stroke-width="2" fill="none" stroke-linecap="round"/>' + // Smile
+        '</svg>';
+    }
+  }
+
   function applyTeacherPersonaStyling() {
     var personaVal = (profile && profile.persona) ? profile.persona : 'chopper';
     var iconEl = $('animeAvatarIconDisplay');
@@ -1112,22 +1153,26 @@ window.AiTeacherTeaching = (function () {
 
     if (avatarBox) {
       avatarBox.classList.remove('aura-blue', 'aura-red', 'aura-green');
+      var svgHtml = getPersonaAvatarSvg(personaVal);
+
       if (personaVal === 'shanks') {
         avatarBox.classList.add('aura-red');
-        if (iconEl) iconEl.textContent = '🏴‍☠️';
+        if (iconEl) iconEl.innerHTML = svgHtml;
         if (nameEl) nameEl.textContent = 'Shanks';
         if (particlesEl) particlesEl.textContent = '⚡';
       } else if (personaVal === 'lucky_roux') {
         avatarBox.classList.add('aura-green');
-        if (iconEl) iconEl.textContent = '🍗';
+        if (iconEl) iconEl.innerHTML = svgHtml;
         if (nameEl) nameEl.textContent = 'Lucky Roux';
         if (particlesEl) particlesEl.textContent = '✨';
       } else {
         avatarBox.classList.add('aura-blue');
-        if (iconEl) iconEl.textContent = '🧪';
+        if (iconEl) iconEl.innerHTML = svgHtml;
         if (nameEl) nameEl.textContent = 'Chopper';
         if (particlesEl) particlesEl.textContent = '🌸';
       }
+    }
+  }
     }
   }
 
