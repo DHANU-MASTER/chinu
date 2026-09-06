@@ -1244,6 +1244,28 @@ window.AiTeacherTeaching = (function () {
     }
   }
 
+  function renderMilestoneChecklist() {
+    var box = $('tsMilestoneChecklist');
+    if (!box || !lesson) return;
+    box.innerHTML = '';
+
+    var items = ['Intro'];
+    (lesson.sections || []).forEach(function (sec, idx) {
+      items.push('Section ' + (idx + 1));
+    });
+    items.push('Quiz');
+
+    items.forEach(function (label, idx) {
+      var item = document.createElement('div');
+      var isCurrent = idx === step;
+      var isDone = idx < step;
+      item.className = 'milestone-item' + (isCurrent ? ' active' : (isDone ? ' done' : ''));
+      var badge = isDone ? '✓' : (isCurrent ? '▶' : '○');
+      item.innerHTML = '<span class="milestone-badge">' + badge + '</span><span>' + escapeHtml(label) + '</span>';
+      box.appendChild(item);
+    });
+  }
+
   function showStep() {
     var sections = lesson.sections.length;
 
@@ -1254,6 +1276,8 @@ window.AiTeacherTeaching = (function () {
     hideQuestionArea();
     hideAdaptiveArea();
     resetQuestionState();
+
+    renderMilestoneChecklist();
 
     if (isIntro()) {
       renderIntro();

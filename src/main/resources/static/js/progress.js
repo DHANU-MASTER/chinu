@@ -36,6 +36,7 @@ window.AiTeacherProgress = (function () {
 
   var els = {};
   var studentName = '';
+  var lastSummaryData = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -85,6 +86,8 @@ window.AiTeacherProgress = (function () {
   /* ======================== Render Dashboard ======================== */
 
   function renderDashboard(summary) {
+    lastSummaryData = summary;
+
     // Summary cards
     renderSummaryCards(summary);
 
@@ -102,6 +105,44 @@ window.AiTeacherProgress = (function () {
 
     // Next topic
     renderNextTopic(summary.latestNextTopic);
+
+    // Search filter setup
+    var searchInput = $('historySearchInput');
+    if (searchInput) {
+      searchInput.oninput = function () {
+        var query = searchInput.value.toLowerCase().trim();
+        var filtered = (lastSummaryData && lastSummaryData.recentActivity) ? lastSummaryData.recentActivity.filter(function (item) {
+          return String(item.topic || '').toLowerCase().indexOf(query) > -1 ||
+                 String(item.percentage || '').indexOf(query) > -1 ||
+                 String(item.completedAt || '').toLowerCase().indexOf(query) > -1 ||
+                 String(item.status || '').toLowerCase().indexOf(query) > -1;
+        }) : [];
+        renderHistoryTable(filtered);
+      };
+    }
+
+    // CSV Export setup
+    var exportBtn = $('btnExportHistoryCsv');
+    if (exportBtn) {
+      exportBtn.onclick = function () {
+        if (!lastSummaryData || !lastSummaryData.recentActivity || lastSummaryData.recentActivity.length === 0) {
+          if (window.showToast) window.showToast('No history records to export.', 'warn');
+          return;
+        }
+        var csvRows = ['Topic,Score (%),Date,Status'];
+        lastSummaryData.recentActivity.forEach(function (row) {
+          csvRows.push('"' + String(row.topic).replace(/"/g, '""') + '",' + row.percentage + ',"' + row.completedAt + '","' + row.status + '"');
+        });
+        var blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = (studentName || 'learning') + '_history.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        if (window.showToast) window.showToast('Exported learning history CSV!', 'success');
+      };
+    }
 
     // Empty state
     if (summary.totalLessonsCompleted === 0) {

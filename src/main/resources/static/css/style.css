@@ -259,7 +259,49 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   4. Upgraded 3D Anime Teacher Avatar Artwork
+   4. Milestone Progress Checklist Box
+   -------------------------------------------------------------------------- */
+.milestone-checklist-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.milestone-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--surface-strong);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.milestone-item.active {
+  background: rgba(49, 208, 255, 0.2);
+  border: 1px solid var(--brand-2);
+  color: var(--brand-2);
+}
+
+.milestone-item.done {
+  background: rgba(47, 230, 168, 0.18);
+  border: 1px solid var(--ok);
+  color: var(--ok);
+}
+
+.milestone-badge { font-weight: 800; }
+
+/* --------------------------------------------------------------------------
+   5. Upgraded 3D Anime Teacher Avatar Artwork
    -------------------------------------------------------------------------- */
 .anime-avatar-artwork {
   display: flex;
@@ -296,7 +338,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   5. Smart 3D Animated Visual Stage Animations (DNA, Physics, Math, Code)
+   6. Smart 3D Animated Visual Stage Animations (DNA, Physics, Math, Code)
    -------------------------------------------------------------------------- */
 /* Rotating 3D DNA Helix */
 .dna-helix-3d {
@@ -387,7 +429,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   6. Timetable & Schedule Grid + Slot Deletion
+   7. Timetable & Schedule Grid + Slot Deletion
    -------------------------------------------------------------------------- */
 .timetable-header {
   display: flex;
@@ -494,6 +536,94 @@ a:hover {
 .leaderboard-avatar { font-size: 1.3rem; }
 .leaderboard-name { flex: 1; color: var(--ink-1); }
 .leaderboard-score { color: var(--ok); }
+
+/* Certificate Modal Styling */
+.certificate-container {
+  background: radial-gradient(circle at center, rgba(124, 108, 255, 0.12), transparent 70%), var(--bg-1);
+  padding: 24px;
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+}
+
+.certificate-border {
+  border: 4px double var(--warn);
+  padding: 24px 16px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.cert-logo { font-size: 3rem; }
+.cert-org { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: var(--warn); margin: 4px 0 0; }
+.cert-sub { font-size: 0.8rem; font-weight: 700; color: var(--brand-2); margin-bottom: 16px; }
+
+.cert-present { font-size: 0.9rem; font-style: italic; color: var(--ink-2); }
+.cert-student-name { font-size: 1.8rem; font-weight: 800; color: var(--ink-1); margin: 6px 0; border-bottom: 2px solid var(--brand-1); display: inline-block; padding-bottom: 4px; }
+.cert-text { font-size: 0.88rem; color: var(--ink-2); margin: 12px 0 6px; }
+.cert-topic { font-size: 1.25rem; font-weight: 800; color: var(--brand-2); margin-bottom: 20px; }
+
+.cert-metrics-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  margin-block: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+}
+
+.cert-metric-item { display: flex; flex-direction: column; align-items: center; }
+.cert-metric-label { font-size: 0.72rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
+.cert-metric-value { font-size: 0.95rem; font-weight: 800; color: var(--ok); margin-top: 2px; }
+
+.certificate-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+}
+
+.cert-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2.2rem;
+  color: var(--warn);
+}
+
+.cert-signature { display: flex; flex-direction: column; align-items: flex-end; }
+.sig-font { font-family: "Brush Script MT", cursive, sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--brand-2); border-bottom: 1px solid var(--border-strong); padding-bottom: 2px; }
+.sig-title { font-size: 0.72rem; color: var(--ink-3); margin-top: 2px; }
+
+.report-top-actions { display: flex; gap: 8px; }
+
+/* Achievement Badges Grid */
+.achievement-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.achievement-badge-card {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.achievement-badge-card.unlocked {
+  background: rgba(255, 194, 77, 0.12);
+  border-color: var(--warn);
+}
+
+.badge-icon { font-size: 1.8rem; margin-bottom: 2px; }
+.badge-title { font-size: 0.8rem; font-weight: 800; color: var(--ink-1); }
+.badge-desc { font-size: 0.68rem; color: var(--ink-3); }
 
 /* Auto-Save Session Recovery & Toast Notifications */
 .resume-banner {
@@ -614,7 +744,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   7. Cards, Forms & Inputs
+   8. Cards, Forms & Inputs
    -------------------------------------------------------------------------- */
 .card {
   border-radius: var(--radius);
@@ -734,7 +864,7 @@ a:hover {
 .btn-block { width: 100%; }
 
 /* --------------------------------------------------------------------------
-   8. Anime 3D Persona Cards Grid
+   9. Anime 3D Persona Cards Grid
    -------------------------------------------------------------------------- */
 .persona-cards-grid {
   display: grid;
@@ -862,7 +992,7 @@ a:hover {
 .rag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
 
 /* --------------------------------------------------------------------------
-   9. Teaching Stage & Avatar Visual Status
+   10. Teaching Stage & Avatar Visual Status
    -------------------------------------------------------------------------- */
 .teach-header {
   display: flex;

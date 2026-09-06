@@ -517,6 +517,11 @@
           </div>
         </div>
 
+        <!-- Lesson Milestone Progress Checklist Widget -->
+        <div id="tsMilestoneChecklist" class="milestone-checklist-box">
+          <!-- Populated dynamically via JS -->
+        </div>
+
         <div class="teach-stage" id="ts-stage">
           <div class="teach-avatar aura-blue" id="ts-avatar" data-state="idle" aria-label="AI Teacher avatar">
             <div class="avatar-status-badge" id="avatarStatusBadge">
@@ -815,8 +820,18 @@
       <!-- Progress Dashboard -->
       <section id="progressDashboard" class="card card-pad stack hidden progress-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
         <div class="progress-header">
-          <h2>My Learning History</h2>
-          <button class="btn btn-ghost btn-sm" id="progress-back" type="button">← Back to Setup</button>
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <h2 style="margin: 0">My Learning History</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-ghost btn-sm" id="btnExportHistoryCsv" type="button">📥 Export CSV</button>
+              <button class="btn btn-ghost btn-sm" id="progress-back" type="button">← Back to Setup</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Search & Filter Control -->
+        <div class="field" style="margin-block: 12px;">
+          <input class="input" id="historySearchInput" type="text" placeholder="🔍 Search history by topic, score, or status…" />
         </div>
 
         <div id="progress-loading" class="question-loading">
@@ -1140,7 +1155,7 @@
             emptyText.textContent = 'No slots scheduled.';
             dayCard.appendChild(emptyText);
           } else {
-            daySlots.forEach(function (slot, idx) {
+            daySlots.forEach(function (slot) {
               var slotDiv = document.createElement('div');
               slotDiv.className = 'schedule-slot';
 

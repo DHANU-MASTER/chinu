@@ -17,54 +17,61 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 - **Email & Password Auth:** Full registration (`POST /api/auth/register`) and sign-in (`POST /api/auth/login`) with accounts persisted in H2 Database.
 - **In-App Profile & Avatar Settings:** Edit full name, reset/overwrite password, pick from preset avatars, or upload a custom image file (automatically compressed via canvas thumbnail scaling to compact Base64 Data URL).
 
-### 📜 2. Printable Certificate of AI Mastery & PDF Reports
+### 🎯 2. Lesson Milestone Progress Checklist Widget
+- **Live Section Progression Bar:** Section milestone checklist box on the Teaching Stage tracking lesson progression (`[x] Intro`, `[/] Section 1`, `[ ] Section 2`, `[ ] Final Assessment`).
+
+### 📜 3. Printable Certificate of AI Mastery & PDF Reports
 - **📜 Formal Certificate of Completion:** Generated upon completing assessments with student name, avatar, topic, mastery score %, date, and official AI Teacher signature. Includes a 1-click **`🖨️ Print / Save Certificate PDF`** trigger!
 
-### 🔥 3. Daily Study Streak Tracker & Achievement Badges
+### 🔥 4. Daily Study Streak Tracker & Achievement Badges
 - **Streak Counter:** Topbar badge tracking daily learning momentum (`🔥 1-Day Streak`, `🔥 3-Day Streak`).
 - **Unlocked Achievement Badges:** `First Steps 🏅`, `Quiz Ace 🎯`, and `Haki Awakened ⚡` badges on the Progress Dashboard.
 
-### 🔊 4. Web Audio API Sound Effects Manager (`🔊 / 🔇`)
+### 🔊 5. Web Audio API Sound Effects Manager (`🔊 / 🔇`)
 - Zero-dependency Web Audio API oscillator chime synthesizer playing audio cues on correct answers (`✨ Victory Chime`), persona selection (`🌸 Persona Shift`), and certificate unlocks.
 
-### 📅 5. AI Study Timetable & Schedule Planner
+### 📅 6. AI Study Timetable & Schedule Planner
 - **Interactive Weekly Schedule Grid (Mon – Sun):** Visual daily time blocks (*Morning*, *Afternoon*, *Evening*).
+- **🗑️ Slot Deletion:** 1-click delete icon button on every scheduled slot.
 - **🤖 1-Click "Generate AI Revision Schedule":** Evaluates weak areas from past reports and creates an optimized weekly revision schedule.
 - **🚀 1-Click "Start Session":** Launches the AI Teacher stage with pre-filled topic and study time.
-- **🏆 Leaderboard Card:** Displays top student ranks (`Supreme Haki Master`, `Master`, `Adept`).
+- **🏆 Dynamic Leaderboard Card:** Displays top student ranks (`Supreme Haki Master`, `Master`, `Adept`).
 
-### 🎭 6. 3 Anime 3D AI Teacher Personas
+### 🎭 7. 3 Anime 3D AI Teacher Personas
 - 🧪 **Chopper — The Kind & Clever Doctor:** Step-by-step, analytical & caring explanations (Blue Sakura Aura 🌸).
 - 🏴‍☠️ **Red-Haired Shanks — The Inspiring Captain:** High-energy, bold & motivating real-world examples (Red Conqueror's Haki Aura ⚡).
 - 🍗 **Lucky Roux — The Quick & Friendly Specialist:** Fast, fun, approachable & algorithmic breakdowns (Green Energy Aura ✨).
 
-### 🧙‍♂️ 7. 2-Step Personalized Learning Wizard & Quick-Demo Chips
+### 🧙‍♂️ 8. 2-Step Personalized Learning Wizard & Quick-Demo Chips
 - **Step 1 (Teacher & Profile):** Persona Choice (Chopper / Shanks / Lucky Roux), Educational Level, Preferred Language (English / Hindi / Kannada), Teaching Style.
 - **Step 2 (Learning Content & Goals):**
   - **⚡ 1-Click Quick-Demo Sample Chips:** Instant topic fills for `⚡ Newton's Laws`, `🧬 DNA Replication`, `💻 Python Recursion`, `📐 Pythagoras Theorem`.
   - Custom topic input OR document file upload.
 
-### 📄 8. Document Extraction & RAG Grounding
+### 📄 9. Document Extraction & RAG Grounding
 - **File Text Extraction:** Extracts readable content from PDF (PDFBox), PPT/PPTX (Apache POI), and plain text files.
 - **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts.
 - **🎯 98% RAG Confidence Badge:** Displays document grounding confidence when uploaded material is present.
 
-### 🎬 9. Always-Animated 3D Stage Visual Playgrounds
-- **💻 Code Execution Sandbox (`code`):** Interactive code box with `▶ Run Code` console, line tracer, terminal output, and copy code button.
-- **⚡ Physics Vector Simulator (`process`):** 3D force vector arrows with clickable toggles (`Gravity 🌐`, `Friction ⚙️`, `Velocity 🚀`).
-- **📐 Math Step Explorer (`equation`):** Step-by-step calculation buttons (`[Step 1]`, `[Step 2]`, `[Step 3]`).
-- **🧬 Process Cycle (`diagram`):** Interactive stage tabs (`1. Intake ➔ 2. Process ➔ 3. Release`).
-- **🗺️ Timeline Roadmap (`timeline`):** 3D interactive milestone nodes.
+### 🎬 10. Smart 3D Animated Visual Stage Generator for ANY Topic
+- 🧬 **Biology / DNA / Genetics:** Rotating 3D DNA Double Helix Animation with base pairs (`A-T`, `C-G`).
+- ⚡ **Physics / Forces / Motion / Newton:** Moving 3D Force Vector & Trajectory Simulator (`Gravity`, `Velocity`, `Friction`).
+- 📐 **Math / Geometry / Algebra:** Rotating 3D Geometric Shape & Calculation Engine.
+- 💻 **Code / Python / Java / Recursion:** Animated 3D Call Stack & Terminal Execution Sandbox.
+- 🗺️ **History / Milestones / Eras:** Animated Glowing Timeline Roadmap.
+- ⚛️ **Chemistry / Space / Universal Fallback:** Animated 3D Atomic Orbit & Concept Nucleus Network!
 
-### 🎙️ 10. Live Microphone Audio + Video Stream Recording
+### 🎙️ 11. Live Microphone Audio + Video Stream Recording
 - **MediaRecorder + Web Audio API:** Captures 30 FPS composite canvas rendering of avatar, subtitles, progress bar, and visual stage **merged with live microphone audio narration** into downloadable `.webm`/`.mp4` video files.
 
-### 📝 11. Assessment & Student Mastery Power Meter
+### 📝 12. Assessment & Student Mastery Power Meter
 - **Final Quiz & Grading:** 5-question comprehensive assessment.
 - **⚡ Student Haki Mastery Power Meter (0-100%):** Visual rank meter (`Novice ➔ Adept ➔ Master ➔ Supreme Haki Master`).
 
-### 📊 12. Personal History & Progress Dashboard
-- **Session Tracking:** Tracks completed sessions, scores, weak areas, and question logs per student in file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`).
+### 📊 13. Personal History & Progress Dashboard (with Live Search & CSV Export)
+- **🔍 Live Search Filter Bar:** Filter history records by topic, date, or score in real-time as you type.
+- **📥 CSV Data Export:** 1-click download of student learning session history as a structured `.csv` file.
+- **Persistent Database:** Backed by file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`).
 
 ---
 
