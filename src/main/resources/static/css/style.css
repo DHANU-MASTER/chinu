@@ -259,97 +259,135 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   4. Certificate Modal Styling
+   4. Upgraded 3D Anime Teacher Avatar Artwork
    -------------------------------------------------------------------------- */
-.certificate-container {
-  background: radial-gradient(circle at center, rgba(124, 108, 255, 0.12), transparent 70%), var(--bg-1);
-  padding: 24px;
-  border-radius: var(--radius-sm);
-  margin-top: 10px;
-}
-
-.certificate-border {
-  border: 4px double var(--warn);
-  padding: 24px 16px;
-  border-radius: 12px;
-  position: relative;
-}
-
-.cert-logo { font-size: 3rem; }
-.cert-org { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: var(--warn); margin: 4px 0 0; }
-.cert-sub { font-size: 0.8rem; font-weight: 700; color: var(--brand-2); margin-bottom: 16px; }
-
-.cert-present { font-size: 0.9rem; font-style: italic; color: var(--ink-2); }
-.cert-student-name { font-size: 1.8rem; font-weight: 800; color: var(--ink-1); margin: 6px 0; border-bottom: 2px solid var(--brand-1); display: inline-block; padding-bottom: 4px; }
-.cert-text { font-size: 0.88rem; color: var(--ink-2); margin: 12px 0 6px; }
-.cert-topic { font-size: 1.25rem; font-weight: 800; color: var(--brand-2); margin-bottom: 20px; }
-
-.cert-metrics-row {
-  display: flex;
-  justify-content: space-around;
-  gap: 12px;
-  margin-block: 20px;
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border);
-}
-
-.cert-metric-item { display: flex; flex-direction: column; align-items: center; }
-.cert-metric-label { font-size: 0.72rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
-.cert-metric-value { font-size: 0.95rem; font-weight: 800; color: var(--ok); margin-top: 2px; }
-
-.certificate-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 24px;
-}
-
-.cert-seal {
+.anime-avatar-artwork {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 2.2rem;
-  color: var(--warn);
+  justify-content: center;
+  padding: 14px;
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle at center, rgba(124, 108, 255, 0.25), rgba(13, 20, 40, 0.8));
+  border: 3px solid var(--brand-2);
+  box-shadow: 0 0 24px rgba(49, 208, 255, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.1);
+  animation: floatAvatar 3s ease-in-out infinite;
 }
 
-.cert-signature { display: flex; flex-direction: column; align-items: flex-end; }
-.sig-font { font-family: "Brush Script MT", cursive, sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--brand-2); border-bottom: 1px solid var(--border-strong); padding-bottom: 2px; }
-.sig-title { font-size: 0.72rem; color: var(--ink-3); margin-top: 2px; }
-
-.report-top-actions { display: flex; gap: 8px; }
-
-/* Achievement Badges Grid */
-.achievement-badges-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
-  margin-top: 8px;
+@keyframes floatAvatar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
-.achievement-badge-card {
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.anime-avatar-icon-display {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
-.achievement-badge-card.unlocked {
-  background: rgba(255, 194, 77, 0.12);
-  border-color: var(--warn);
+.anime-avatar-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
-
-.badge-icon { font-size: 1.8rem; margin-bottom: 2px; }
-.badge-title { font-size: 0.8rem; font-weight: 800; color: var(--ink-1); }
-.badge-desc { font-size: 0.68rem; color: var(--ink-3); }
 
 /* --------------------------------------------------------------------------
-   5. Timetable Dashboard & Schedule Grid
+   5. Smart 3D Animated Visual Stage Animations (DNA, Physics, Math, Code)
+   -------------------------------------------------------------------------- */
+/* Rotating 3D DNA Helix */
+.dna-helix-3d {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  width: 100%;
+}
+
+.dna-pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: rotateDna 2.5s ease-in-out infinite alternate;
+}
+
+.dna-pair:nth-child(2) { animation-delay: 0.2s; }
+.dna-pair:nth-child(3) { animation-delay: 0.4s; }
+.dna-pair:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes rotateDna {
+  0% { transform: rotateY(0deg) scale(0.9); }
+  100% { transform: rotateY(180deg) scale(1.1); }
+}
+
+.dna-node {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d1428;
+}
+
+.dna-node-a { background: var(--brand-2); box-shadow: 0 0 10px var(--brand-2); }
+.dna-node-t { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.dna-node-c { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+.dna-node-g { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+
+.dna-bond {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-2), var(--accent));
+  border-radius: 2px;
+}
+
+/* 3D Atomic Orbit */
+.atomic-orbit-3d {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+}
+
+.atomic-nucleus {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand-2);
+  box-shadow: 0 0 20px var(--brand-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.atomic-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed rgba(49, 208, 255, 0.4);
+  animation: spinRing 4s linear infinite;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   6. Timetable & Schedule Grid + Slot Deletion
    -------------------------------------------------------------------------- */
 .timetable-header {
   display: flex;
@@ -395,6 +433,22 @@ a:hover {
   background: rgba(124, 108, 255, 0.1);
   border: 1px solid rgba(124, 108, 255, 0.25);
   font-size: var(--fs-small);
+  position: relative;
+}
+
+.slot-delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+  padding: 2px 4px;
+}
+
+.slot-delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.15);
 }
 
 .slot-start-btn {
@@ -560,7 +614,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   6. Cards, Forms & Inputs
+   7. Cards, Forms & Inputs
    -------------------------------------------------------------------------- */
 .card {
   border-radius: var(--radius);
@@ -680,86 +734,8 @@ a:hover {
 .btn-block { width: 100%; }
 
 /* --------------------------------------------------------------------------
-   7. Auth Screen & Tabs
+   8. Anime 3D Persona Cards Grid
    -------------------------------------------------------------------------- */
-.auth-logo { font-size: 3rem; margin-bottom: 4px; }
-
-.auth-tabs {
-  display: flex;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border);
-}
-
-.auth-tab {
-  flex: 1;
-  padding: 10px;
-  font-weight: 700;
-  font-size: var(--fs-small);
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: var(--ink-3);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.auth-tab.active {
-  background: var(--grad-brand);
-  color: #070b16;
-  box-shadow: 0 2px 10px rgba(124, 108, 255, 0.3);
-}
-
-/* --------------------------------------------------------------------------
-   8. 2-Step Wizard & Anime 3D Personas
-   -------------------------------------------------------------------------- */
-.wizard-progress-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: var(--space-2);
-}
-
-.wizard-step-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
-}
-
-.wizard-step-indicator.active { opacity: 1; }
-
-.step-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.wizard-step-indicator.active .step-num {
-  background: var(--brand-2);
-  color: #070b16;
-  border-color: var(--brand-2);
-}
-
-.step-label { font-size: var(--fs-small); font-weight: 700; }
-
-.wizard-step-line {
-  width: 40px;
-  height: 2px;
-  background: var(--border);
-}
-
-/* Anime 3D Persona Cards Grid */
 .persona-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -976,11 +952,6 @@ a:hover {
 
 .bubble-particles { margin-left: 4px; font-size: 0.9em; }
 
-.teacher-figure {
-  width: 100px;
-  height: 120px;
-}
-
 .teach-visual {
   height: auto;
   min-height: 180px;
@@ -1073,124 +1044,8 @@ a:hover {
   opacity: 0.3;
 }
 
-.motif-equation::before { content: "f(x) = ax² + bx + c"; font-size: 1.5rem; font-weight: 800; color: var(--brand-2); display: flex; align-items: center; justify-content: center; height: 100%; }
-.motif-process::before { content: "Step 1 ➔ Step 2 ➔ Step 3"; font-size: 1.2rem; font-weight: 800; color: var(--ok); display: flex; align-items: center; justify-content: center; height: 100%; }
-.motif-code::before { content: "def learn(topic):\n  return understand()"; font-size: 1rem; font-family: monospace; color: var(--accent); display: flex; align-items: center; justify-content: center; height: 100%; }
-.motif-timeline::before { content: "1900 ─── 1950 ─── 2026"; font-size: 1.2rem; font-weight: 800; color: var(--warn); display: flex; align-items: center; justify-content: center; height: 100%; }
-.motif-diagram::before { content: "[ Concept A ] ⇄ [ Concept B ]"; font-size: 1.2rem; font-weight: 800; color: var(--brand-1); display: flex; align-items: center; justify-content: center; height: 100%; }
-
 .visual-title { font-size: var(--fs-3); font-weight: 800; position: relative; z-index: 1; }
 .visual-note { font-size: var(--fs-small); color: var(--brand-2); position: relative; z-index: 1; }
-
-/* --------------------------------------------------------------------------
-   10. Learning Path, Report Styling & Power Meter
-   -------------------------------------------------------------------------- */
-.power-meter-container {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  background: rgba(124, 108, 255, 0.1);
-  border: 1px solid rgba(124, 108, 255, 0.3);
-}
-
-.power-meter-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: var(--fs-small);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.power-rank-badge {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--brand-2);
-  color: #070b16;
-  font-weight: 800;
-  font-size: 0.72rem;
-}
-
-.power-meter-bar-track {
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-
-.power-meter-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--ok), var(--brand-2), var(--accent));
-  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.learning-path-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.path-step-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  background: rgba(124, 108, 255, 0.08);
-  border: 1px solid rgba(124, 108, 255, 0.25);
-}
-
-.path-step-badge {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--brand-1);
-  color: #070b16;
-  font-size: 0.75rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.path-step-title { font-weight: 700; font-size: var(--fs-body); }
-
-/* Option Cards for MCQs */
-.option-list {
-  display: grid;
-  gap: 8px;
-  margin-block: 8px;
-}
-
-.option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid var(--border);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s ease;
-}
-
-.option:hover { border-color: var(--brand-2); background: rgba(49, 208, 255, 0.08); }
-.option[aria-pressed="true"] { border-color: var(--brand-1); background: rgba(124, 108, 255, 0.18); font-weight: 700; }
-
-.option .key {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--surface-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-}
 
 /* Print Styles */
 @media print {

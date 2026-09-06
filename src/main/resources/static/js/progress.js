@@ -56,6 +56,7 @@ window.AiTeacherProgress = (function () {
   /* ======================== Load Progress Data ======================== */
 
   async function loadProgress(name) {
+    cacheEls();
     studentName = name;
     showDashboard();
     els['progress-loading'].classList.remove('hidden');

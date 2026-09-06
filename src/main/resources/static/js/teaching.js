@@ -1026,12 +1026,24 @@ window.AiTeacherTeaching = (function () {
     if (!container) return;
     container.innerHTML = '';
 
-    var h = String(hint || '').toLowerCase().trim();
+    var fullContext = (String(hint || '') + ' ' + String(title || '') + ' ' + (lesson ? String(lesson.topic || '') : '')).toLowerCase();
 
-    if (h === 'code') {
+    // 1. DNA / Genetics / Biology / Cell / Life
+    if (fullContext.indexOf('dna') > -1 || fullContext.indexOf('gene') > -1 || fullContext.indexOf('bio') > -1 || fullContext.indexOf('cell') > -1 || fullContext.indexOf('replicat') > -1) {
+      var dnaContainer = document.createElement('div');
+      dnaContainer.className = 'dna-helix-3d';
+      dnaContainer.innerHTML =
+        '<div class="dna-pair"><span class="dna-node dna-node-a">A</span><div class="dna-bond"></div><span class="dna-node dna-node-t">T</span></div>' +
+        '<div class="dna-pair"><span class="dna-node dna-node-c">C</span><div class="dna-bond"></div><span class="dna-node dna-node-g">G</span></div>' +
+        '<div class="dna-pair"><span class="dna-node dna-node-t">T</span><div class="dna-bond"></div><span class="dna-node dna-node-a">A</span></div>' +
+        '<div class="dna-pair"><span class="dna-node dna-node-g">G</span><div class="dna-bond"></div><span class="dna-node dna-node-c">C</span></div>';
+      container.appendChild(dnaContainer);
+    }
+    // 2. Programming / Code / Python / Java / Recursion
+    else if (fullContext.indexOf('code') > -1 || fullContext.indexOf('python') > -1 || fullContext.indexOf('java') > -1 || fullContext.indexOf('recursion') > -1 || fullContext.indexOf('algorithm') > -1) {
       var terminal = document.createElement('div');
       terminal.className = 'widget-code-terminal';
-      terminal.innerHTML = '<code>// Live Interactive Code Sandbox\nfunction learn(concept) {\n  return "Mastered " + concept;\n}\nconsole.log(learn("' + escapeHtml(title || 'Topic') + '"));</code>';
+      terminal.innerHTML = '<code>// Interactive 3D Call Stack Sandbox\nfunction solve(topic) {\n  return "Mastered " + topic;\n}\nconsole.log(solve("' + escapeHtml(title || 'Concept') + '"));</code>';
 
       var runBtn = document.createElement('button');
       runBtn.type = 'button';
@@ -1041,13 +1053,15 @@ window.AiTeacherTeaching = (function () {
         var output = document.createElement('div');
         output.style.color = '#31d0ff';
         output.style.marginTop = '6px';
-        output.textContent = 'Output ➔ "Mastered ' + (title || 'Topic') + '"';
+        output.textContent = 'Output ➔ "Mastered ' + (title || 'Concept') + '"';
         terminal.appendChild(output);
-        if (window.showToast) window.showToast('Executed code in sandbox console!', 'success');
+        if (window.showToast) window.showToast('Executed code in sandbox!', 'success');
       };
       terminal.appendChild(runBtn);
       container.appendChild(terminal);
-    } else if (h === 'process' || h === 'diagram') {
+    }
+    // 3. Physics / Motion / Newton / Force / Velocity
+    else if (fullContext.indexOf('physic') > -1 || fullContext.indexOf('motion') > -1 || fullContext.indexOf('force') > -1 || fullContext.indexOf('newton') > -1 || fullContext.indexOf('gravity') > -1 || fullContext.indexOf('velocity') > -1) {
       var sandbox = document.createElement('div');
       sandbox.className = 'widget-vector-sandbox';
       ['Gravity 🌐', 'Velocity 🚀', 'Friction ⚙️'].forEach(function (btnLabel, idx) {
@@ -1063,10 +1077,12 @@ window.AiTeacherTeaching = (function () {
         sandbox.appendChild(btn);
       });
       container.appendChild(sandbox);
-    } else if (h === 'equation') {
+    }
+    // 4. Mathematics / Geometry / Equation / Calculus
+    else if (fullContext.indexOf('math') > -1 || fullContext.indexOf('equation') > -1 || fullContext.indexOf('pythagoras') > -1 || fullContext.indexOf('calculus') > -1 || fullContext.indexOf('geometry') > -1) {
       var stepGroup = document.createElement('div');
       stepGroup.className = 'widget-step-buttons';
-      ['Step 1: Formula', 'Step 2: Substitution', 'Step 3: Output'].forEach(function (label) {
+      ['Step 1: Formula', 'Step 2: Substitution', 'Step 3: Calculation'].forEach(function (label) {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'step-calc-btn';
@@ -1078,10 +1094,47 @@ window.AiTeacherTeaching = (function () {
       });
       container.appendChild(stepGroup);
     }
+    // 5. Universal Fallback: 3D Atomic Orbit & Concept Network
+    else {
+      var atomicContainer = document.createElement('div');
+      atomicContainer.className = 'atomic-orbit-3d';
+      atomicContainer.innerHTML = '<div class="atomic-ring"></div><div class="atomic-nucleus">⚛️</div>';
+      container.appendChild(atomicContainer);
+    }
+  }
+
+  function applyTeacherPersonaStyling() {
+    var personaVal = (profile && profile.persona) ? profile.persona : 'chopper';
+    var iconEl = $('animeAvatarIconDisplay');
+    var nameEl = $('animeAvatarNameDisplay');
+    var particlesEl = $('ts-bubble-particles');
+    var avatarBox = els['ts-avatar'];
+
+    if (avatarBox) {
+      avatarBox.classList.remove('aura-blue', 'aura-red', 'aura-green');
+      if (personaVal === 'shanks') {
+        avatarBox.classList.add('aura-red');
+        if (iconEl) iconEl.textContent = '🏴‍☠️';
+        if (nameEl) nameEl.textContent = 'Shanks';
+        if (particlesEl) particlesEl.textContent = '⚡';
+      } else if (personaVal === 'lucky_roux') {
+        avatarBox.classList.add('aura-green');
+        if (iconEl) iconEl.textContent = '🍗';
+        if (nameEl) nameEl.textContent = 'Lucky Roux';
+        if (particlesEl) particlesEl.textContent = '✨';
+      } else {
+        avatarBox.classList.add('aura-blue');
+        if (iconEl) iconEl.textContent = '🧪';
+        if (nameEl) nameEl.textContent = 'Chopper';
+        if (particlesEl) particlesEl.textContent = '🌸';
+      }
+    }
   }
 
   function renderIntro() {
     clearBody();
+    applyTeacherPersonaStyling();
+
     els['ts-section-title'].textContent = UI.welcomeTitle;
     els['ts-section-title'].className = 'teach-body-heading';
     addParagraph(els['ts-text'], lesson.introduction, 'muted');
@@ -1102,9 +1155,10 @@ window.AiTeacherTeaching = (function () {
 
     els['ts-visual-title'].textContent = lesson.lessonTitle;
     els['ts-visual-note'].textContent = UI.teaching;
-    setMotif('generic');
-    renderInteractiveWidget('diagram', lesson.lessonTitle);
-    els['ts-bubble'].querySelector('#ts-bubble-text').textContent = UI.welcomeTitle;
+    renderInteractiveWidget('generic', lesson.lessonTitle);
+
+    var bubbleText = els['ts-bubble'].querySelector('#ts-bubble-text');
+    if (bubbleText) bubbleText.textContent = UI.welcomeTitle;
 
     var introText = lesson.introduction || '';
     if (lesson.learningObjectives && lesson.learningObjectives.length > 0) {
@@ -1115,6 +1169,8 @@ window.AiTeacherTeaching = (function () {
 
   function renderSection(index) {
     clearBody();
+    applyTeacherPersonaStyling();
+
     var section = lesson.sections[index] || {};
     var title = section.title || (UI.sectionFallback + ' ' + (index + 1));
     var explanation = section.explanation || section.description || '';
@@ -1137,7 +1193,6 @@ window.AiTeacherTeaching = (function () {
 
     els['ts-visual-title'].textContent = title;
     els['ts-visual-note'].textContent = UI.teaching;
-    setMotif(section.visualHint);
     renderInteractiveWidget(section.visualHint, title);
 
     var bubbleText = els['ts-bubble'].querySelector('#ts-bubble-text');
