@@ -198,6 +198,19 @@ a:hover {
   border-color: var(--brand-2);
 }
 
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 194, 77, 0.15);
+  border: 1px solid var(--warn);
+  font-size: var(--fs-small);
+  font-weight: 800;
+  color: var(--warn);
+}
+
 .user-avatar-circle {
   display: inline-flex;
   align-items: center;
@@ -246,7 +259,97 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   4. Timetable Dashboard & Schedule Grid
+   4. Certificate Modal Styling
+   -------------------------------------------------------------------------- */
+.certificate-container {
+  background: radial-gradient(circle at center, rgba(124, 108, 255, 0.12), transparent 70%), var(--bg-1);
+  padding: 24px;
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+}
+
+.certificate-border {
+  border: 4px double var(--warn);
+  padding: 24px 16px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.cert-logo { font-size: 3rem; }
+.cert-org { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: var(--warn); margin: 4px 0 0; }
+.cert-sub { font-size: 0.8rem; font-weight: 700; color: var(--brand-2); margin-bottom: 16px; }
+
+.cert-present { font-size: 0.9rem; font-style: italic; color: var(--ink-2); }
+.cert-student-name { font-size: 1.8rem; font-weight: 800; color: var(--ink-1); margin: 6px 0; border-bottom: 2px solid var(--brand-1); display: inline-block; padding-bottom: 4px; }
+.cert-text { font-size: 0.88rem; color: var(--ink-2); margin: 12px 0 6px; }
+.cert-topic { font-size: 1.25rem; font-weight: 800; color: var(--brand-2); margin-bottom: 20px; }
+
+.cert-metrics-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  margin-block: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+}
+
+.cert-metric-item { display: flex; flex-direction: column; align-items: center; }
+.cert-metric-label { font-size: 0.72rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
+.cert-metric-value { font-size: 0.95rem; font-weight: 800; color: var(--ok); margin-top: 2px; }
+
+.certificate-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+}
+
+.cert-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2.2rem;
+  color: var(--warn);
+}
+
+.cert-signature { display: flex; flex-direction: column; align-items: flex-end; }
+.sig-font { font-family: "Brush Script MT", cursive, sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--brand-2); border-bottom: 1px solid var(--border-strong); padding-bottom: 2px; }
+.sig-title { font-size: 0.72rem; color: var(--ink-3); margin-top: 2px; }
+
+.report-top-actions { display: flex; gap: 8px; }
+
+/* Achievement Badges Grid */
+.achievement-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.achievement-badge-card {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.achievement-badge-card.unlocked {
+  background: rgba(255, 194, 77, 0.12);
+  border-color: var(--warn);
+}
+
+.badge-icon { font-size: 1.8rem; margin-bottom: 2px; }
+.badge-title { font-size: 0.8rem; font-weight: 800; color: var(--ink-1); }
+.badge-desc { font-size: 0.68rem; color: var(--ink-3); }
+
+/* --------------------------------------------------------------------------
+   5. Timetable Dashboard & Schedule Grid
    -------------------------------------------------------------------------- */
 .timetable-header {
   display: flex;
@@ -457,7 +560,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   5. Cards, Forms & Inputs
+   6. Cards, Forms & Inputs
    -------------------------------------------------------------------------- */
 .card {
   border-radius: var(--radius);
@@ -577,7 +680,7 @@ a:hover {
 .btn-block { width: 100%; }
 
 /* --------------------------------------------------------------------------
-   6. Auth Screen & Tabs
+   7. Auth Screen & Tabs
    -------------------------------------------------------------------------- */
 .auth-logo { font-size: 3rem; margin-bottom: 4px; }
 
@@ -609,7 +712,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   7. 2-Step Wizard & Anime 3D Personas
+   8. 2-Step Wizard & Anime 3D Personas
    -------------------------------------------------------------------------- */
 .wizard-progress-bar {
   display: flex;
@@ -783,7 +886,7 @@ a:hover {
 .rag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
 
 /* --------------------------------------------------------------------------
-   8. Teaching Stage & Avatar Visual Status
+   9. Teaching Stage & Avatar Visual Status
    -------------------------------------------------------------------------- */
 .teach-header {
   display: flex;
@@ -980,7 +1083,7 @@ a:hover {
 .visual-note { font-size: var(--fs-small); color: var(--brand-2); position: relative; z-index: 1; }
 
 /* --------------------------------------------------------------------------
-   9. Learning Path, Report Styling & Power Meter
+   10. Learning Path, Report Styling & Power Meter
    -------------------------------------------------------------------------- */
 .power-meter-container {
   margin-top: 12px;
@@ -1056,7 +1159,7 @@ a:hover {
 
 /* Option Cards for MCQs */
 .option-list {
-  display.grid;
+  display: grid;
   gap: 8px;
   margin-block: 8px;
 }
@@ -1092,6 +1195,8 @@ a:hover {
 /* Print Styles */
 @media print {
   body { background: #ffffff !important; color: #000000 !important; }
-  .topbar, .report-actions, .toast-container, .resume-banner { display: none !important; }
+  .topbar, .report-actions, .toast-container, .resume-banner, .modal-footer-actions, .modal-header { display: none !important; }
   .card { border: none !important; box-shadow: none !important; background: transparent !important; }
+  .certificate-modal-card { max-width: 100% !important; border: none !important; box-shadow: none !important; }
+  .certificate-border { border: 4px double #1a2238 !important; color: #1a2238 !important; }
 }

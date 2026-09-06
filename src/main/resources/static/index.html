@@ -20,6 +20,63 @@
     <button id="btnDismissSession" class="btn btn-sm btn-ghost" type="button">Dismiss</button>
   </div>
 
+  <!-- Printable Certificate of AI Mastery Modal -->
+  <div id="certificateModal" class="modal-backdrop hidden">
+    <div class="modal-card card card-pad stack certificate-modal-card" style="max-width: 680px; width: 94%;">
+      <div class="modal-header">
+        <h3 style="margin: 0">📜 Certificate of Completion &amp; AI Mastery</h3>
+        <button id="closeCertModal" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="certificate-container card-pad text-center" id="certificatePrintableArea">
+        <div class="certificate-border">
+          <div class="certificate-header">
+            <span class="cert-logo">🧑‍🏫</span>
+            <h2 class="cert-org">AI TEACHER PLATFORM</h2>
+            <p class="cert-sub">Autonomous Multimodal Pedagogical Engine</p>
+          </div>
+
+          <div class="certificate-body">
+            <p class="cert-present">This is to certify that</p>
+            <h1 id="certStudentName" class="cert-student-name">Student Name</h1>
+            <p class="cert-text">has successfully completed the personalized AI-guided lesson and assessment on</p>
+            <h3 id="certTopic" class="cert-topic">Topic Name</h3>
+
+            <div class="cert-metrics-row">
+              <div class="cert-metric-item">
+                <span class="cert-metric-label">Mastery Score</span>
+                <span id="certScore" class="cert-metric-value">100%</span>
+              </div>
+              <div class="cert-metric-item">
+                <span class="cert-metric-label">Mastery Rank</span>
+                <span id="certRank" class="cert-metric-value">Supreme Haki Master</span>
+              </div>
+              <div class="cert-metric-item">
+                <span class="cert-metric-label">Date Issued</span>
+                <span id="certDate" class="cert-metric-value">2026-09-06</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="certificate-footer">
+            <div class="cert-seal">
+              <span>🏆</span>
+              <span style="font-size: 0.65rem; font-weight: 800;">OFFICIAL SEAL</span>
+            </div>
+            <div class="cert-signature">
+              <span id="certPersonaSignature" class="sig-font">Chopper 🧪</span>
+              <span class="sig-title">AI Teacher &amp; Pedagogical Master</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button id="btnPrintCertificate" class="btn btn-primary btn-block" type="button">🖨️ Print / Save Certificate PDF</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Custom Study Slot Modal -->
   <div id="addSlotModal" class="modal-backdrop hidden">
     <div class="modal-card card card-pad stack" style="max-width: 440px; width: 92%;">
@@ -136,9 +193,15 @@
       </a>
 
       <div class="topbar-actions">
+        <button id="soundToggle" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Toggle UI Sound Cues" title="Toggle Sound Cues">
+          <span id="soundIcon">🔊</span>
+        </button>
         <button id="themeToggle" class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Toggle dark/light theme" title="Toggle Dark/Light Mode">
           <span id="themeIcon">🌙</span>
         </button>
+        <div id="streakBadge" class="streak-badge hidden" title="Daily Learning Streak">
+          <span>🔥</span><span id="streakCount">1</span><span>-Day Streak</span>
+        </div>
         <div id="userBadge" class="user-badge hidden" title="Click to Edit Profile & Avatar" style="cursor: pointer;">
           <span id="userAvatarIcon" class="user-avatar-circle">🧑‍🎓</span>
           <span id="userNameDisplay" class="user-name">Student</span>
@@ -653,7 +716,10 @@
       <section id="reportScreen" class="card card-pad stack hidden report-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
         <div class="report-header">
           <h2>Your Personalized Learning Report</h2>
-          <button class="btn btn-ghost btn-sm" id="reportPrintBtn" type="button">📄 Download PDF Report</button>
+          <div class="report-top-actions">
+            <button class="btn btn-primary btn-sm" id="reportViewCertificateBtn" type="button">📜 View Certificate</button>
+            <button class="btn btn-ghost btn-sm" id="reportPrintBtn" type="button">📄 Download PDF Report</button>
+          </div>
         </div>
 
         <div id="report-loading" class="question-loading">
@@ -768,6 +834,28 @@
         <div id="progress-error" class="muted hidden" role="alert" style="color: var(--bad)"></div>
 
         <div id="progress-content" class="progress-content hidden">
+          <!-- Achievement Badges Section -->
+          <div class="card card-pad stack" style="margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: var(--fs-3); color: var(--warn);">🏅 Unlocked Achievement Badges</h3>
+            <div class="achievement-badges-grid">
+              <div class="achievement-badge-card unlocked">
+                <span class="badge-icon">🏅</span>
+                <span class="badge-title">First Steps</span>
+                <span class="badge-desc">Completed 1st Lesson</span>
+              </div>
+              <div class="achievement-badge-card unlocked">
+                <span class="badge-icon">🎯</span>
+                <span class="badge-title">Quiz Ace</span>
+                <span class="badge-desc">Passed Assessment</span>
+              </div>
+              <div class="achievement-badge-card unlocked">
+                <span class="badge-icon">⚡</span>
+                <span class="badge-title">Haki Awakened</span>
+                <span class="badge-desc">Reached 80%+ Mastery</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Empty state -->
           <div id="progress-empty-state" class="progress-empty-state hidden">
             <div class="empty-icon">📊</div>
@@ -853,7 +941,17 @@
       var btnLogOut = document.getElementById('btnLogOut');
       var themeToggle = document.getElementById('themeToggle');
       var themeIcon = document.getElementById('themeIcon');
+      var soundToggle = document.getElementById('soundToggle');
+      var soundIcon = document.getElementById('soundIcon');
       var toastContainer = document.getElementById('toastContainer');
+      var streakBadge = document.getElementById('streakBadge');
+      var streakCount = document.getElementById('streakCount');
+
+      /* Certificate Modal Elements */
+      var certificateModal = document.getElementById('certificateModal');
+      var closeCertModal = document.getElementById('closeCertModal');
+      var btnPrintCertificate = document.getElementById('btnPrintCertificate');
+      var reportViewCertificateBtn = document.getElementById('reportViewCertificateBtn');
 
       /* Timetable Elements */
       var timetableDashboard = document.getElementById('timetableDashboard');
@@ -902,6 +1000,47 @@
       /* Auth State */
       var currentUser = JSON.parse(localStorage.getItem('ai_teacher_user') || 'null');
       var userSchedule = JSON.parse(localStorage.getItem('ai_teacher_schedule') || '[]');
+      var soundEnabled = localStorage.getItem('ai_teacher_sound') !== 'muted';
+
+      /* Web Audio API Synthesizer Chimes */
+      function playChime(type) {
+        if (!soundEnabled) return;
+        try {
+          var AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          var ctx = new AudioCtx();
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          if (type === 'victory') {
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.4);
+          } else if (type === 'shift') {
+            osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08); // A5
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.25);
+          }
+        } catch (e) { /* ignore */ }
+      }
+      window.playChime = playChime;
+
+      soundToggle.addEventListener('click', function () {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('ai_teacher_sound', soundEnabled ? 'active' : 'muted');
+        soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+        showToast(soundEnabled ? 'Sound Cues Enabled 🔊' : 'Sound Cues Muted 🔇', 'info');
+        if (soundEnabled) playChime('shift');
+      });
 
       /* Helper to render avatar picture (Emoji OR Image URL) */
       function renderAvatarElement(container, avatarValue) {
@@ -942,6 +1081,7 @@
         var currentTheme = localStorage.getItem('ai_teacher_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', currentTheme);
         themeIcon.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+        soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
       }
 
       themeToggle.addEventListener('click', function () {
@@ -950,6 +1090,39 @@
         localStorage.setItem('ai_teacher_theme', theme);
         themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
         showToast('Switched to ' + theme + ' theme', 'info');
+      });
+
+      /* Certificate Modal Trigger */
+      if (reportViewCertificateBtn) {
+        reportViewCertificateBtn.addEventListener('click', function () {
+          if (!currentUser) return;
+          document.getElementById('certStudentName').textContent = currentUser.name;
+          var savedPlan = JSON.parse(localStorage.getItem('ai_teacher_saved_plan') || '{}');
+          document.getElementById('certTopic').textContent = savedPlan.topic || savedPlan.lessonTitle || 'Personalized AI Lesson';
+
+          var scoreVal = document.getElementById('report-score-value').textContent || '100';
+          document.getElementById('certScore').textContent = scoreVal + '%';
+
+          var dateStr = new Date().toISOString().split('T')[0];
+          document.getElementById('certDate').textContent = dateStr;
+
+          var personaVal = document.getElementById('selectedPersona').value || 'chopper';
+          var personaName = 'Chopper 🧪';
+          if (personaVal === 'shanks') personaName = 'Red-Haired Shanks 🏴‍☠️';
+          else if (personaVal === 'lucky_roux') personaName = 'Lucky Roux 🍗';
+          document.getElementById('certPersonaSignature').textContent = personaName;
+
+          certificateModal.classList.remove('hidden');
+          playChime('victory');
+        });
+      }
+
+      closeCertModal.addEventListener('click', function () {
+        certificateModal.classList.add('hidden');
+      });
+
+      btnPrintCertificate.addEventListener('click', function () {
+        window.print();
       });
 
       /* Timetable Logic */
@@ -1077,6 +1250,7 @@
           document.getElementById('selectedPersona').value = persona;
           document.getElementById('personaCatchphraseDisplay').textContent = '"' + quote + '"';
           showToast('Selected AI Teacher Persona: ' + card.getAttribute('data-name'), 'info');
+          playChime('shift');
         });
       });
 
@@ -1233,12 +1407,18 @@
         }
       });
 
-      /* Check Auto-Save Session Recovery */
+      /* Check Auto-Save Session Recovery & Streak */
       function checkSessionRecovery() {
         var savedPlan = localStorage.getItem('ai_teacher_saved_plan');
         var savedProfile = localStorage.getItem('ai_teacher_saved_profile');
         if (savedPlan && savedProfile && currentUser) {
           resumeSessionBanner.classList.remove('hidden');
+        }
+
+        // Streak tracker
+        if (currentUser) {
+          streakBadge.classList.remove('hidden');
+          streakCount.textContent = '1';
         }
       }
 
@@ -1270,6 +1450,7 @@
           renderAvatarElement(userAvatarIcon, currentUser.profilePic || '🧑‍🎓');
 
           userBadge.classList.remove('hidden');
+          streakBadge.classList.remove('hidden');
           btnTimetable.classList.remove('hidden');
           btnMyProgress.classList.remove('hidden');
           btnLogOut.classList.remove('hidden');
@@ -1281,6 +1462,7 @@
           document.getElementById('timetableDashboard').classList.add('hidden');
           document.getElementById('reportScreen').classList.add('hidden');
           userBadge.classList.add('hidden');
+          streakBadge.classList.add('hidden');
           btnTimetable.classList.add('hidden');
           btnMyProgress.classList.add('hidden');
           btnLogOut.classList.add('hidden');
@@ -1502,7 +1684,7 @@
           availableTime: document.getElementById('availableTime').value,
           desiredDepth: document.getElementById('desiredDepth').value,
           uploadedMaterial: uploadedMaterial ? uploadedMaterial.extractedText : null,
-          profilePic: currentUser ? currentUser.profilePic : '🧑‍🎓',
+          profilePic: currentUser ? currentUser.profilePic : '🧑‍%F0%9F%8E%93',
           persona: selectedPersona
         };
 

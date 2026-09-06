@@ -3,11 +3,11 @@
 [![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
 [![Build Passing](https://img.shields.io/badge/Build-185_Tests_Passing-success)](#-testing)
-[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Enabled-blue)](#-4-document-extraction--rag-grounding)
+[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Enabled-blue)](#-5-document-extraction--rag-grounding)
 
 An enterprise-grade AI teaching platform designed to provide a human-like, adaptive pedagogical experience — driven by real user profile data, document extraction (PDF / TXT / PPT / PPTX), RAG grounding, and generative AI models.
 
-The system accepts any **topic** or **uploaded study document**, creates a structured lesson, narrates content with AI voice & 3D anime avatars (**Chopper** 🧪, **Red-Haired Shanks** 🏴‍☠️, **Lucky Roux** 🍗), asks interactive section check questions, detects student misconceptions, re-explains adaptively, generates final assessments, produces printable PDF learning reports with concept roadmaps, manages daily study schedules via an **AI Timetable Planner**, and saves student history in a persistent H2 database.
+The system accepts any **topic** or **uploaded study document**, creates a structured lesson, narrates content with AI voice & 3D anime avatars (**Chopper** 🧪, **Red-Haired Shanks** 🏴‍☠️, **Lucky Roux** 🍗), asks interactive section check questions, detects student misconceptions, re-explains adaptively, generates final assessments, produces printable **Certificates of AI Mastery** & PDF learning reports, manages daily study schedules via an **AI Timetable Planner**, tracks **daily study streaks & achievement badges**, and saves student history in a persistent H2 database.
 
 ---
 
@@ -17,55 +17,54 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 - **Email & Password Auth:** Full registration (`POST /api/auth/register`) and sign-in (`POST /api/auth/login`) with accounts persisted in H2 Database.
 - **In-App Profile & Avatar Settings:** Edit full name, reset/overwrite password, pick from preset avatars, or upload a custom image file (automatically compressed via canvas thumbnail scaling to compact Base64 Data URL).
 
-### 📅 2. AI Study Timetable & Schedule Planner
-- **Interactive Weekly Schedule Grid (Mon – Sun):** Visual daily time blocks (*Morning*, *Afternoon*, *Evening*).
-- **🤖 1-Click "Generate AI Revision Schedule":** Evaluates the student's weak areas from past assessment reports and automatically creates an optimized weekly revision timetable!
-- **🚀 1-Click "Start Session":** Immediately launches the AI Teacher stage with pre-filled topic and study time.
-- **➕ Custom Slot Adder:** Add custom subjects, durations, and preferred teacher personas.
-- **🏆 Leaderboard Card:** Displays student mastery ranks (`Supreme Haki Master`, `Master`, `Adept`).
+### 📜 2. Printable Certificate of AI Mastery & PDF Reports
+- **📜 Formal Certificate of Completion:** Generated upon completing assessments with student name, avatar, topic, mastery score %, date, and official AI Teacher signature. Includes a 1-click **`🖨️ Print / Save Certificate PDF`** trigger!
 
-### 🎭 3. 3 Anime 3D AI Teacher Personas
-Select your preferred AI Teacher character in Step 1 of the Wizard:
+### 🔥 3. Daily Study Streak Tracker & Achievement Badges
+- **Streak Counter:** Topbar badge tracking daily learning momentum (`🔥 1-Day Streak`, `🔥 3-Day Streak`).
+- **Unlocked Achievement Badges:** `First Steps 🏅`, `Quiz Ace 🎯`, and `Haki Awakened ⚡` badges on the Progress Dashboard.
+
+### 🔊 4. Web Audio API Sound Effects Manager (`🔊 / 🔇`)
+- Zero-dependency Web Audio API oscillator chime synthesizer playing audio cues on correct answers (`✨ Victory Chime`), persona selection (`🌸 Persona Shift`), and certificate unlocks.
+
+### 📅 5. AI Study Timetable & Schedule Planner
+- **Interactive Weekly Schedule Grid (Mon – Sun):** Visual daily time blocks (*Morning*, *Afternoon*, *Evening*).
+- **🤖 1-Click "Generate AI Revision Schedule":** Evaluates weak areas from past reports and creates an optimized weekly revision schedule.
+- **🚀 1-Click "Start Session":** Launches the AI Teacher stage with pre-filled topic and study time.
+- **🏆 Leaderboard Card:** Displays top student ranks (`Supreme Haki Master`, `Master`, `Adept`).
+
+### 🎭 6. 3 Anime 3D AI Teacher Personas
 - 🧪 **Chopper — The Kind & Clever Doctor:** Step-by-step, analytical & caring explanations (Blue Sakura Aura 🌸).
 - 🏴‍☠️ **Red-Haired Shanks — The Inspiring Captain:** High-energy, bold & motivating real-world examples (Red Conqueror's Haki Aura ⚡).
 - 🍗 **Lucky Roux — The Quick & Friendly Specialist:** Fast, fun, approachable & algorithmic breakdowns (Green Energy Aura ✨).
 
-### 🧙‍♂️ 4. 2-Step Personalized Learning Wizard & Quick-Demo Chips
+### 🧙‍♂️ 7. 2-Step Personalized Learning Wizard & Quick-Demo Chips
 - **Step 1 (Teacher & Profile):** Persona Choice (Chopper / Shanks / Lucky Roux), Educational Level, Preferred Language (English / Hindi / Kannada), Teaching Style.
 - **Step 2 (Learning Content & Goals):**
   - **⚡ 1-Click Quick-Demo Sample Chips:** Instant topic fills for `⚡ Newton's Laws`, `🧬 DNA Replication`, `💻 Python Recursion`, `📐 Pythagoras Theorem`.
   - Custom topic input OR document file upload.
-  - Learning Objective, Available Study Time (10m, 20m, 30m, 45m), Desired Depth, and Prior Knowledge.
 
-### 📄 5. Document Extraction & RAG Grounding
+### 📄 8. Document Extraction & RAG Grounding
 - **File Text Extraction:** Extracts readable content from PDF (PDFBox), PPT/PPTX (Apache POI), and plain text files.
-- **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts with relevant document excerpts.
+- **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts.
 - **🎯 98% RAG Confidence Badge:** Displays document grounding confidence when uploaded material is present.
 
-### 🎬 6. Always-Animated 3D Stage Visual Playgrounds
+### 🎬 9. Always-Animated 3D Stage Visual Playgrounds
 - **💻 Code Execution Sandbox (`code`):** Interactive code box with `▶ Run Code` console, line tracer, terminal output, and copy code button.
 - **⚡ Physics Vector Simulator (`process`):** 3D force vector arrows with clickable toggles (`Gravity 🌐`, `Friction ⚙️`, `Velocity 🚀`).
 - **📐 Math Step Explorer (`equation`):** Step-by-step calculation buttons (`[Step 1]`, `[Step 2]`, `[Step 3]`).
 - **🧬 Process Cycle (`diagram`):** Interactive stage tabs (`1. Intake ➔ 2. Process ➔ 3. Release`).
 - **🗺️ Timeline Roadmap (`timeline`):** 3D interactive milestone nodes.
 
-### 🎙️ 7. Live Microphone Audio + Video Stream Recording
+### 🎙️ 10. Live Microphone Audio + Video Stream Recording
 - **MediaRecorder + Web Audio API:** Captures 30 FPS composite canvas rendering of avatar, subtitles, progress bar, and visual stage **merged with live microphone audio narration** into downloadable `.webm`/`.mp4` video files.
 
-### 📝 8. Assessment, Printable PDF Report & Power Meter
+### 📝 11. Assessment & Student Mastery Power Meter
 - **Final Quiz & Grading:** 5-question comprehensive assessment.
 - **⚡ Student Haki Mastery Power Meter (0-100%):** Visual rank meter (`Novice ➔ Adept ➔ Master ➔ Supreme Haki Master`).
-- **📄 Download PDF Report:** `📄 Download PDF Report` trigger (`window.print()`) for physical/PDF export.
-- **🗺️ Concept Learning Path Roadmap:** Structured step-by-step topic progression map.
 
-### 📊 9. Personal History & Progress Dashboard
+### 📊 12. Personal History & Progress Dashboard
 - **Session Tracking:** Tracks completed sessions, scores, weak areas, and question logs per student in file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`).
-
-### 🎨 10. UI/UX Polish, Session Recovery & Theme Toggle
-- **↺ Auto-Save Session Recovery:** Saves current lesson state to `localStorage` with a `Resume Previous Session` banner.
-- **🌙 / ☀️ Light & Dark Theme Toggle:** Instant client-side theme switching.
-- **🔔 Floating Toast Notifications:** Real-time feedback alerts.
-- **🏹 Arrow Mark Navigation:** Clear `← Back` and `Next →` navigation across all screens.
 
 ---
 
