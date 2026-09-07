@@ -63,16 +63,39 @@ public class AIQuestionGenerationService implements QuestionGenerationService {
             throw AiException.unavailable("AI question generation is not configured: the AI_API_KEY environment variable is not set.");
         }
 
+        String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(request));
+
+        return parseQuestion(rawContent);
+    }
+
+    /**
+     * Streaming variant of {@link #generateQuestion(QuestionRequest)}: forwards
+     * each content delta to the listener as the question is being written, then
+     * parses the fully accumulated text into the validated question.
+     */
+    public QuestionResponse generateQuestionStreaming(QuestionRequest request,
+            java.util.function.Consumer<String> onDelta) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw AiException.unavailable("AI question generation is not configured: the AI_API_KEY environment variable is not set.");
+        }
+
+        StringBuilder accumulated = new StringBuilder();
+        chatClient.streamChatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(request), delta -> {
+            accumulated.append(delta);
+            onDelta.accept(delta);
+        });
+
+        return parseQuestion(accumulated.toString());
+    }
+
+    /** Builds the exact chat messages used for question generation. */
+    public List<ChatMessage> prepareMessages(QuestionRequest request) {
         String outputLanguage = languageName(request.getLanguage());
         String questionType = decideQuestionType();
 
-        List<ChatMessage> messages = List.of(
+        return List.of(
                 ChatMessage.system(buildSystemPrompt(outputLanguage, questionType)),
                 ChatMessage.user(buildUserPrompt(request)));
-
-        String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, messages);
-
-        return parseQuestion(rawContent);
     }
 
     /** Randomly choose between MCQ and SHORT_ANSWER to provide variety. */

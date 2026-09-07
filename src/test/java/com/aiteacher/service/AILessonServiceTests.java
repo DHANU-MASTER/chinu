@@ -396,6 +396,19 @@ class AILessonServiceTests {
 	}
 
 	/** Fake transport: returns a canned body or throws, and records the request. */
+	@Test
+	void streamingGenerationForwardsDeltasAndParsesSamePlan() {
+		StudentProfileRequest input = profile("Meera", "Professional", "English", "Visual",
+				"Understand the basics", "Karnataka temple architecture");
+		chatClient.respond(VALID_AI_JSON);
+
+		StringBuilder receivedDeltas = new StringBuilder();
+		LessonPlanResponse plan = service("sk-test-123").generateLessonStreaming(input, receivedDeltas::append);
+
+		assertEquals(VALID_AI_JSON, receivedDeltas.toString());
+		assertEquals("Understanding the topic", plan.getLessonTitle());
+	}
+
 	private static final class FakeChatClient implements AiChatClient {
 
 		private String responseBody;
@@ -435,6 +448,23 @@ class AILessonServiceTests {
 				throw failure;
 			}
 			return responseBody;
+		}
+
+		@Override
+		public void streamChatCompletion(String baseUrl, String apiKey, String model,
+				List<ChatMessage> messages, TokenListener listener) {
+			this.lastBaseUrl = baseUrl;
+			this.lastApiKey = apiKey;
+			this.lastModel = model;
+			this.lastMessages = messages;
+			if (failure != null) {
+				throw failure;
+			}
+			// Emit the response body in three chunks, like a real SSE provider would.
+			int third = Math.max(1, responseBody.length() / 3);
+			listener.onDelta(responseBody.substring(0, third));
+			listener.onDelta(responseBody.substring(third, 2 * third));
+			listener.onDelta(responseBody.substring(2 * third));
 		}
 	}
 }

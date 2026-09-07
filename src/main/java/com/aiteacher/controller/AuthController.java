@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aiteacher.auth.PasswordHasher;
 import com.aiteacher.dto.AuthResponse;
 import com.aiteacher.dto.LoginRequest;
 import com.aiteacher.dto.RegisterRequest;
@@ -24,10 +25,14 @@ import com.aiteacher.repository.UserAccountRepository;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserAccountRepository userRepository;
+    private static final int MIN_PASSWORD_LENGTH = 8;
 
-    public AuthController(UserAccountRepository userRepository) {
+    private final UserAccountRepository userRepository;
+    private final PasswordHasher passwordHasher;
+
+    public AuthController(UserAccountRepository userRepository, PasswordHasher passwordHasher) {
         this.userRepository = userRepository;
+        this.passwordHasher = passwordHasher;
     }
 
     /**
@@ -44,8 +49,8 @@ public class AuthController {
         if (isBlank(request.getPassword())) {
             return badRequest("Password must not be empty.");
         }
-        if (request.getPassword().length() < 4) {
-            return badRequest("Password must be at least 4 characters long.");
+        if (request.getPassword().length() < MIN_PASSWORD_LENGTH) {
+            return badRequest("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long.");
         }
 
         String email = request.getEmail().trim().toLowerCase();
@@ -59,7 +64,7 @@ public class AuthController {
         UserAccount user = UserAccount.builder()
                 .name(request.getName().trim())
                 .email(email)
-                .passwordHash(hashPassword(request.getPassword().trim()))
+                .passwordHash(passwordHasher.encode(request.getPassword().trim()))
                 .profilePic(avatar)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -98,9 +103,15 @@ public class AuthController {
         }
 
         UserAccount user = userOpt.get();
-        if (!user.getPasswordHash().equals(hashPassword(request.getPassword().trim()))) {
+        if (!passwordHasher.matches(request.getPassword().trim(), user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid email or password. Please check your credentials."));
+        }
+
+        // Transparently upgrade legacy hashes to BCrypt on successful login
+        if (passwordHasher.needsUpgrade(user.getPasswordHash())) {
+            user.setPasswordHash(passwordHasher.encode(request.getPassword().trim()));
+            userRepository.save(user);
         }
 
         String avatar = isBlank(user.getProfilePic()) ? "🧑‍🎓" : user.getProfilePic();
@@ -143,10 +154,10 @@ public class AuthController {
         // Reset password if newPassword is provided
         if (payload.containsKey("newPassword") && !isBlank(payload.get("newPassword"))) {
             String newPass = payload.get("newPassword").trim();
-            if (newPass.length() < 4) {
-                return badRequest("New password must be at least 4 characters long.");
+            if (newPass.length() < MIN_PASSWORD_LENGTH) {
+                return badRequest("New password must be at least " + MIN_PASSWORD_LENGTH + " characters long.");
             }
-            user.setPasswordHash(hashPassword(newPass));
+            user.setPasswordHash(passwordHasher.encode(newPass));
         }
 
         userRepository.save(user);
@@ -160,10 +171,6 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(response);
-    }
-
-    private static String hashPassword(String password) {
-        return Integer.toHexString(password.hashCode());
     }
 
     private static boolean isBlank(String value) {

@@ -1,8 +1,12 @@
 # 🎓 AI Teacher — Autonomous Multimodal Pedagogical SaaS Platform
 
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/your-username/ai-teacher/actions/workflows/ci.yml)
 [![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
-[![Build Passing](https://img.shields.io/badge/Build-185_Tests_Passing-success)](#-testing)
+[![Tests](https://img.shields.io/badge/Tests-196_passing-success)](#-testing)
+[![E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)](#-testing)
+[![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)](#-platform-capabilities-latest)
+[![License](https://img.shields.io/badge/License-MIT-9cf)](LICENSE)
 [![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Enabled-blue)](#-5-document-extraction--rag-grounding)
 
 An enterprise-grade AI teaching platform designed to provide a human-like, adaptive pedagogical experience — driven by real user profile data, document extraction (PDF / TXT / PPT / PPTX), RAG grounding, and generative AI models.
@@ -147,13 +151,43 @@ Open browser at: **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
+## 🚀 Platform Capabilities (latest)
+
+- **🎬 Guest Demo Mode** — `Try a Demo Lesson` on the login screen (or `index.html?demo=1`) explores the full app without an account.
+- **🎨 Landing Page** — `landing.html` introduces the product and deep-links into demo mode.
+- **🎤 Voice Answers** — speak answers to check questions (Web Speech Recognition, English/Hindi/Kannada) via the mic button on any answer box.
+- **💬 Ask the Teacher** — free-form mid-lesson Q&A: `POST /api/lesson/ask` answers in the current persona's voice, grounded in the section being taught.
+- **🲸 SSE Streaming** — lessons *and* check questions generate token-by-token (`/api/lesson/plan/stream`, `/api/lesson/question/stream`): the AI writes live on screen while the response is still in flight.
+- **🌐 UI i18n** — the app chrome translates to Hindi/Kannada via `js/i18n.js` (follows the Preferred Language selector).
+- **📱 Installable PWA** — `manifest.webmanifest` + `sw.js` (offline app shell; API calls are always live).
+- **🔐 BCrypt Passwords** — hashes upgraded from the legacy scheme with transparent migration on login; minimum 8 characters.
+- **📊 Live API Docs** — Swagger UI at `/swagger-ui.html` (springdoc-openapi).
+- **🐳 Docker Deployment** — `docker compose up --build` runs the app + PostgreSQL (`SPRING_PROFILES_ACTIVE=postgres`), with `Dockerfile` for custom builds.
+- **🤖 CI** — GitHub Actions runs the full test suite and JAR build on every push/PR (`.github/workflows/ci.yml`).
+
 ## 🧪 Testing
 
-Run the full automated test suite (185 unit & integration tests):
+Run the full automated test suite (196 unit & integration tests):
 
 ```bash
 cmd /c mvnw.cmd test
 ```
+
+### Browser E2E tests (Playwright)
+
+The `e2e/` specs cover the AI-free journey — landing page, demo mode, auth UI,
+i18n and PWA assets — against the real Spring Boot app:
+
+```bash
+npm install
+npx playwright install chromium
+cmd /c npm run e2e
+```
+
+`playwright.config.js` boots the app itself (`mvnw spring-boot:run`, reusing an
+already-running instance). Full lesson E2E additionally requires `AI_API_KEY`.
+
+<!-- 📺 TODO: add a demo GIF here: https://github.com/your-username/ai-teacher/raw/main/docs/demo.gif -->
 
 Build production JAR package:
 

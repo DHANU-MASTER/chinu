@@ -73,6 +73,19 @@ class AIQuestionGenerationServiceTests {
             """;
 
     @Test
+    void streamsQuestionDeltasAndParsesSameQuestion() {
+        chatClient.respond(VALID_MCQ_JSON);
+
+        StringBuilder receivedDeltas = new StringBuilder();
+        QuestionResponse question = service("sk-test-123")
+                .generateQuestionStreaming(basicRequest(), receivedDeltas::append);
+
+        assertEquals(VALID_MCQ_JSON, receivedDeltas.toString());
+        assertEquals("MCQ", question.getType());
+        assertEquals(4, question.getOptions().size());
+    }
+
+    @Test
     void generatesMcqFromLessonContent() {
         chatClient.respond(VALID_MCQ_JSON);
         QuestionResponse question = service("sk-test-123").generateQuestion(basicRequest());
@@ -285,6 +298,21 @@ class AIQuestionGenerationServiceTests {
                 throw failure;
             }
             return responseBody;
+        }
+
+        @Override
+        public void streamChatCompletion(String baseUrl, String apiKey, String model,
+                List<ChatMessage> messages, TokenListener listener) {
+            this.lastBaseUrl = baseUrl;
+            this.lastApiKey = apiKey;
+            this.lastModel = model;
+            this.lastMessages = messages;
+            if (failure != null) {
+                throw failure;
+            }
+            int half = Math.max(1, responseBody.length() / 2);
+            listener.onDelta(responseBody.substring(0, half));
+            listener.onDelta(responseBody.substring(half));
         }
     }
 }

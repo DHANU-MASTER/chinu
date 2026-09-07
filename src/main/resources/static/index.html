@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0d1428" />
   <title>AI Teacher — Autonomous Multimodal Pedagogical Platform</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🏫</text></svg>" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -208,42 +209,69 @@
           <span class="edit-badge-icon" style="font-size: 0.7rem; opacity: 0.8;">✏️</span>
         </div>
         <button id="btnTimetable" class="btn btn-ghost btn-sm hidden" type="button">
-          <span>📅 Timetable</span>
+          <span data-i18n="timetable">📅 Timetable</span>
         </button>
         <button id="btnMyProgress" class="btn btn-ghost btn-sm hidden" type="button">
-          <span>📊 My History</span>
+          <span data-i18n="myHistory">📊 My History</span>
         </button>
         <button id="btnLogOut" class="btn btn-ghost btn-sm hidden" type="button">
-          <span>🚪 Log Out</span>
+          <span data-i18n="logOut">🚪 Log Out</span>
         </button>
       </div>
     </header>
 
+    <!-- Persistent flow rail: tells the student where they are in the journey -->
+    <nav id="flowRail" class="flow-rail hidden" aria-label="Learning flow progress">
+      <span class="flow-step" data-step="setup"><span class="flow-dot"></span><span data-i18n="setup">Setup</span></span>
+      <span class="flow-sep" aria-hidden="true"></span>
+      <span class="flow-step" data-step="lesson"><span class="flow-dot"></span><span data-i18n="lesson">Lesson</span></span>
+      <span class="flow-sep" aria-hidden="true"></span>
+      <span class="flow-step" data-step="assess"><span class="flow-dot"></span><span data-i18n="assessment">Assessment</span></span>
+      <span class="flow-sep" aria-hidden="true"></span>
+      <span class="flow-step" data-step="report"><span class="flow-dot"></span><span data-i18n="report">Report</span></span>
+    </nav>
+
     <main class="section">
 
       <!-- ==================== AUTH SCREEN ==================== -->
-      <section id="authScreen" class="card card-pad stack auth-screen" style="max-width: 480px; margin-inline: auto">
-        <div class="auth-header stack-sm text-center">
-          <span class="auth-logo">🧑‍🏫</span>
-          <h1 style="font-size: var(--fs-2); margin: 0">Welcome to AI Teacher</h1>
-          <p class="muted">Sign in to access your personalized learning portal</p>
+      <section id="authScreen" class="card auth-screen">
+        <div class="auth-brand">
+          <div class="auth-brand-inner">
+            <span class="auth-logo">🧑‍🏫</span>
+            <h2 class="auth-brand-title">AI Teacher</h2>
+            <p class="auth-tagline">Learn anything with a personal AI teacher — animated visuals, live narration & mastery tracking.</p>
+            <ul class="auth-features">
+              <li><span class="feature-ico">🎬</span> Animated visual lessons for any topic</li>
+              <li><span class="feature-ico">🎙️</span> Voice narration in 3 languages</li>
+              <li><span class="feature-ico">🧠</span> Adaptive re-teaching when you're stuck</li>
+              <li><span class="feature-ico">📜</span> Certificates, streaks & progress tracking</li>
+            </ul>
+            <div class="auth-brand-glow" aria-hidden="true"></div>
+          </div>
         </div>
 
+        <div class="auth-panel">
+          <div class="auth-header stack-sm text-center">
+            <span class="auth-logo auth-logo-sm">🧑‍🏫</span>
+            <h1 style="font-size: var(--fs-2); margin: 0" data-i18n="welcomeTitle">Welcome to AI Teacher</h1>
+            <p class="muted" data-i18n="welcomeSub">Sign in to access your personalized learning portal</p>
+          </div>
+
         <div class="auth-tabs" role="tablist">
-          <button id="tabLoginBtn" class="auth-tab active" role="tab" aria-selected="true" type="button">Sign In</button>
-          <button id="tabRegisterBtn" class="auth-tab" role="tab" aria-selected="false" type="button">Create Account</button>
+          <button id="tabLoginBtn" class="auth-tab active" role="tab" aria-selected="true" type="button" data-i18n="signIn">Sign In</button>
+          <button id="tabRegisterBtn" class="auth-tab" role="tab" aria-selected="false" type="button" data-i18n="createAccount">Create Account</button>
         </div>
 
         <!-- Login Form -->
         <form id="loginForm" class="stack" novalidate>
           <div class="field">
-            <label for="loginEmail">Email Address *</label>
+            <label for="loginEmail" data-i18n="email">Email Address *</label>
             <input class="input" id="loginEmail" name="email" type="email" autocomplete="email"
                    placeholder="student@example.com" required />
           </div>
 
           <div class="field">
-            <label for="loginPassword">Password *</label>
+            <label for="loginPassword" data-i18n="password">Password *</label>
             <input class="input" id="loginPassword" name="password" type="password" autocomplete="current-password"
                    placeholder="Enter your password" required />
           </div>
@@ -251,7 +279,7 @@
           <p id="loginError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
 
           <button id="loginSubmitBtn" class="btn btn-primary btn-block" type="submit">
-            <span>Sign In to Learn</span>
+            <span data-i18n="signInBtn">Sign In to Learn</span>
             <span aria-hidden="true">→</span>
           </button>
         </form>
@@ -259,21 +287,22 @@
         <!-- Register Form -->
         <form id="registerForm" class="stack hidden" novalidate>
           <div class="field">
-            <label for="regName">Full Name *</label>
+            <label for="regName" data-i18n="fullName">Full Name *</label>
             <input class="input" id="regName" name="name" type="text" autocomplete="name"
                    placeholder="Your name" required maxlength="80" />
           </div>
 
           <div class="field">
-            <label for="regEmail">Email Address *</label>
+            <label for="regEmail" data-i18n="email">Email Address *</label>
             <input class="input" id="regEmail" name="email" type="email" autocomplete="email"
                    placeholder="student@example.com" required />
           </div>
 
           <div class="field">
-            <label for="regPassword">Password *</label>
+            <label for="regPassword" data-i18n="password">Password *</label>
             <input class="input" id="regPassword" name="password" type="password" autocomplete="new-password"
-                   placeholder="At least 4 characters" required minlength="4" />
+                   placeholder="At least 8 characters" required minlength="8" />
+            <p class="field-hint muted">Use 8+ characters — mixing letters and numbers is strongest.</p>
           </div>
 
           <!-- Avatar / Profile Pic Selector -->
@@ -300,14 +329,21 @@
           <p id="registerError" class="muted hidden" role="alert" style="color: var(--bad)"></p>
 
           <button id="registerSubmitBtn" class="btn btn-primary btn-block" type="submit">
-            <span>Register Account</span>
+            <span data-i18n="registerBtn">Register Account</span>
             <span aria-hidden="true">→</span>
           </button>
         </form>
+
+          <div class="auth-divider" aria-hidden="true"><span>or</span></div>
+          <button id="btnDemoMode" class="btn btn-demo btn-block" type="button" title="Explore AI Teacher instantly with a sample lesson">
+            <span aria-hidden="true">🎬</span>
+            <span data-i18n="demoBtn">Try a Demo Lesson — no account needed</span>
+          </button>
+        </div>
       </section>
 
       <!-- ==================== 2-STEP PERSONALIZED WIZARD ==================== -->
-      <section id="wizardScreen" class="card card-pad stack hidden wizard-screen" style="max-width: 660px; margin-inline: auto">
+      <section id="wizardScreen" class="card card-pad stack hidden wizard-screen screen-narrow">
         <div class="wizard-header stack-sm text-center">
           <div class="wizard-top-nav">
             <button id="btnWizardBackToAuth" class="btn btn-ghost btn-sm" type="button">← Back to Log In</button>
@@ -501,7 +537,7 @@
       </section>
 
       <!-- ==================== TEACHING SCREEN ==================== -->
-      <section id="teachingScreen" class="card card-pad stack hidden teaching-screen" style="max-width: 880px; margin-inline: auto" aria-live="polite">
+      <section id="teachingScreen" class="card card-pad stack hidden teaching-screen" aria-live="polite">
         <div class="teach-header">
           <div class="teach-header-info">
             <h2 id="ts-title" style="margin: 0"></h2>
@@ -533,9 +569,18 @@
               <span id="ts-bubble-particles" class="bubble-particles">🌸</span>
             </div>
 
-            <!-- Upgraded 3D Anime Teacher Avatar Artwork Container -->
+            <!-- Lifelike Teacher Figure (head + body + arms, animated by speech state) -->
             <div id="animeAvatarArtwork" class="anime-avatar-artwork">
-              <div class="anime-avatar-icon-display" id="animeAvatarIconDisplay">🧪</div>
+              <div class="teacher-figure" aria-hidden="true">
+                <div class="tf-head">
+                  <div class="tf-face anime-avatar-icon-display" id="animeAvatarIconDisplay">🧪</div>
+                  <span class="tf-mouth"></span>
+                </div>
+                <div class="tf-torso">
+                  <span class="tf-arm tf-arm-l"></span>
+                  <span class="tf-arm tf-arm-r"></span>
+                </div>
+              </div>
               <div class="anime-avatar-name" id="animeAvatarNameDisplay">Chopper</div>
             </div>
           </div>
@@ -547,6 +592,9 @@
             <div class="visual-note" id="ts-visual-note">Teaching…</div>
             <div id="interactiveVisualWidget" class="interactive-visual-widget"></div>
           </div>
+
+          <!-- Live caption overlay (broadcast-style subtitles) -->
+          <div id="ts-subtitle" class="teach-subtitle hidden" aria-live="polite"></div>
         </div>
 
         <!-- Voice Controls -->
@@ -559,17 +607,30 @@
               <span aria-hidden="true">⏹</span> Stop
             </button>
             <div class="voice-rate-selector" id="ts-voice-rate" aria-label="Speech speed"></div>
+            <button id="ts-autoplay" class="btn btn-voice btn-autoplay" type="button" aria-pressed="false" title="Auto-advance sections when narration ends">
+              <span aria-hidden="true">⏭</span> Auto
+            </button>
             <span class="voice-status" id="ts-voice-status" aria-live="polite"></span>
           </div>
         </div>
-
-        <!-- Subtitle Display -->
-        <div id="ts-subtitle" class="teach-subtitle hidden" aria-live="polite"></div>
 
         <div class="teach-body" id="ts-body">
           <h3 id="ts-section-title" class="teach-body-heading"></h3>
           <div id="ts-text"></div>
           <div id="ts-section-example" class="teach-example hidden"></div>
+
+          <!-- Ask the teacher: free-form mid-lesson Q&A -->
+          <div id="ts-ask-area" class="ask-area">
+            <div class="ask-row">
+              <input id="ts-ask-input" class="input" type="text" maxlength="500"
+                     placeholder="Ask your teacher anything about this section…" />
+              <button id="ts-ask-send" class="btn btn-primary btn-sm" type="button" data-i18n="askBtn">Ask</button>
+            </div>
+            <div id="ts-ask-response" class="ask-response hidden">
+              <span class="ask-avatar" aria-hidden="true">🧑‍🏫</span>
+              <span id="ts-ask-response-text"></span>
+            </div>
+          </div>
         </div>
 
         <div id="ts-question-area" class="teach-question-area hidden">
@@ -583,8 +644,11 @@
             <p id="ts-question-text" class="question-text"></p>
             <div id="ts-mcq-options" class="option-list hidden"></div>
             <div id="ts-short-answer" class="short-answer-area hidden">
-              <textarea class="textarea" id="ts-answer-input" rows="3"
-                        placeholder="Type your answer here…" maxlength="1000"></textarea>
+              <div class="voice-input-row">
+                <textarea class="textarea" id="ts-answer-input" rows="3"
+                          placeholder="Type your answer here…" maxlength="1000"></textarea>
+                <button id="ts-answer-mic" class="btn-mic" type="button" aria-label="Answer by voice" aria-pressed="false" title="Answer by voice">🎤</button>
+              </div>
             </div>
             <p id="ts-question-error" class="muted hidden" role="alert" style="color: var(--bad)"></p>
             <button class="btn btn-primary" id="ts-submit-answer" type="button">Submit Answer</button>
@@ -622,8 +686,11 @@
                 <p id="ts-adaptive-followup-text" class="question-text"></p>
                 <div id="ts-adaptive-mcq-options" class="option-list hidden"></div>
                 <div id="ts-adaptive-short-answer" class="short-answer-area hidden">
-                  <textarea class="textarea" id="ts-adaptive-answer-input" rows="3"
-                            placeholder="Type your answer here…" maxlength="1000"></textarea>
+                  <div class="voice-input-row">
+                    <textarea class="textarea" id="ts-adaptive-answer-input" rows="3"
+                              placeholder="Type your answer here…" maxlength="1000"></textarea>
+                    <button id="ts-adaptive-answer-mic" class="btn-mic" type="button" aria-label="Answer by voice" aria-pressed="false" title="Answer by voice">🎤</button>
+                  </div>
                 </div>
                 <p id="ts-adaptive-error" class="muted hidden" role="alert" style="color: var(--bad)"></p>
                 <button class="btn btn-primary" id="ts-adaptive-submit" type="button">Submit Answer</button>
@@ -685,7 +752,7 @@
       </section>
 
       <!-- Final Assessment Screen -->
-      <section id="assessmentScreen" class="card card-pad stack hidden assessment-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+      <section id="assessmentScreen" class="card card-pad stack hidden assessment-screen screen-wide" aria-live="polite">
         <div class="assessment-header">
           <div class="screen-top-nav">
             <button id="btnAssessmentBackToLesson" class="btn btn-ghost btn-sm" type="button">← Back to Lesson Stage</button>
@@ -716,7 +783,7 @@
       </section>
 
       <!-- Learning Report Screen -->
-      <section id="reportScreen" class="card card-pad stack hidden report-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+      <section id="reportScreen" class="card card-pad stack hidden report-screen screen-wide" aria-live="polite">
         <div class="report-header">
           <h2>Your Personalized Learning Report</h2>
           <div class="report-top-actions">
@@ -791,7 +858,7 @@
       </section>
 
       <!-- AI Study Timetable & Schedule Planner Screen -->
-      <section id="timetableDashboard" class="card card-pad stack hidden timetable-screen" style="max-width: 880px; margin-inline: auto" aria-live="polite">
+      <section id="timetableDashboard" class="card card-pad stack hidden timetable-screen screen-stage" aria-live="polite">
         <div class="timetable-header">
           <div>
             <h2 style="margin: 0">📅 AI Study Timetable &amp; Schedule Planner</h2>
@@ -818,7 +885,7 @@
       </section>
 
       <!-- Progress Dashboard -->
-      <section id="progressDashboard" class="card card-pad stack hidden progress-screen" style="max-width: 860px; margin-inline: auto" aria-live="polite">
+      <section id="progressDashboard" class="card card-pad stack hidden progress-screen screen-wide" aria-live="polite">
         <div class="progress-header">
           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <h2 style="margin: 0">My Learning History</h2>
@@ -842,25 +909,24 @@
         <div id="progress-error" class="muted hidden" role="alert" style="color: var(--bad)"></div>
 
         <div id="progress-content" class="progress-content hidden">
+          <!-- Score sparkline + streak heat strip (rendered by progress.js) -->
+          <div id="progress-viz-row" class="progress-viz-row hidden">
+            <div class="card card-pad progress-viz-card">
+              <h3 class="progress-section-title">📈 Score Trend</h3>
+              <div id="progress-sparkline" class="sparkline-box" role="img" aria-label="Score trend across lessons"></div>
+            </div>
+            <div class="card card-pad progress-viz-card">
+              <h3 class="progress-section-title">🔥 Study Activity</h3>
+              <div id="progress-heat" class="heat-strip" role="img" aria-label="Daily study activity"></div>
+              <div class="heat-legend muted">14-day activity</div>
+            </div>
+          </div>
+
           <!-- Achievement Badges Section -->
           <div class="card card-pad stack" style="margin-bottom: 16px;">
             <h3 style="margin: 0; font-size: var(--fs-3); color: var(--warn);">🏅 Unlocked Achievement Badges</h3>
-            <div class="achievement-badges-grid">
-              <div class="achievement-badge-card unlocked">
-                <span class="badge-icon">🏅</span>
-                <span class="badge-title">First Steps</span>
-                <span class="badge-desc">Completed 1st Lesson</span>
-              </div>
-              <div class="achievement-badge-card unlocked">
-                <span class="badge-icon">🎯</span>
-                <span class="badge-title">Quiz Ace</span>
-                <span class="badge-desc">Passed Assessment</span>
-              </div>
-              <div class="achievement-badge-card unlocked">
-                <span class="badge-icon">⚡</span>
-                <span class="badge-title">Haki Awakened</span>
-                <span class="badge-desc">Reached 80%+ Mastery</span>
-              </div>
+            <div class="achievement-badges-grid" id="achievementBadgesGrid">
+              <!-- Rendered dynamically by progress.js -->
             </div>
           </div>
 
@@ -923,6 +989,8 @@
   </div>
 
   <script src="js/speech.js"></script>
+  <script src="js/voice-input.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/recording.js"></script>
   <script src="js/teaching.js"></script>
   <script src="js/assessment.js"></script>
@@ -1122,6 +1190,7 @@
 
           certificateModal.classList.remove('hidden');
           playChime('victory');
+          if (window.confettiBurst) window.confettiBurst();
         });
       }
 
@@ -1139,12 +1208,13 @@
         timetableGridContainer.innerHTML = '';
 
         var days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        var todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
         days.forEach(function (day) {
           var dayCard = document.createElement('div');
-          dayCard.className = 'day-card';
+          dayCard.className = 'day-card' + (day === todayName ? ' today' : '');
           var header = document.createElement('h4');
           header.className = 'day-card-header';
-          header.textContent = day;
+          header.textContent = day + (day === todayName ? ' · Today' : '');
           dayCard.appendChild(header);
 
           var daySlots = userSchedule.filter(function (s) { return s.day === day; });
@@ -1518,6 +1588,90 @@
         resumeSessionBanner.classList.add('hidden');
       });
 
+      /* ==================== Demo Mode ==================== */
+      var btnDemoMode = document.getElementById('btnDemoMode');
+      if (btnDemoMode) {
+        btnDemoMode.addEventListener('click', function () {
+          currentUser = {
+            name: 'Demo Student',
+            email: 'demo@student.ai',
+            profilePic: '🧑‍🎓',
+            demo: true
+          };
+          showToast('Demo mode started — explore freely! 🎬', 'success');
+          updateAuthUI();
+        });
+      }
+
+      /* UI chrome translations + deep-link auto-demo (?demo=1 from landing) */
+      if (window.AiTeacherI18N) window.AiTeacherI18N.init();
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* offline shell unavailable — fine */ });
+      }
+      var languageSelect = document.getElementById('language');
+      if (languageSelect) {
+        languageSelect.addEventListener('change', function () {
+          if (!window.AiTeacherI18N) return;
+          var v = languageSelect.value.toLowerCase();
+          window.AiTeacherI18N.apply(v.startsWith('en') ? 'en' : (v.startsWith('hi') ? 'hi' : 'kn'));
+        });
+      }
+      if (new URLSearchParams(location.search).get('demo') === '1' && btnDemoMode) {
+        btnDemoMode.click();
+      }
+
+      /* ==================== Flow Rail (where am I?) ==================== */
+      var flowRail = document.getElementById('flowRail');
+      var FLOW_SCREENS = [
+        { id: 'wizardScreen', step: 'setup' },
+        { id: 'teachingScreen', step: 'lesson' },
+        { id: 'recordingScreen', step: 'lesson' },
+        { id: 'assessmentScreen', step: 'assess' },
+        { id: 'reportScreen', step: 'report' }
+      ];
+      function updateFlowRail() {
+        if (!flowRail) return;
+        if (!currentUser) { flowRail.classList.add('hidden'); return; }
+        var activeStep = null;
+        FLOW_SCREENS.forEach(function (m) {
+          var el = document.getElementById(m.id);
+          if (el && !el.classList.contains('hidden')) activeStep = m.step;
+        });
+        if (!activeStep) { flowRail.classList.add('hidden'); return; }
+        flowRail.classList.remove('hidden');
+        flowRail.querySelectorAll('.flow-step').forEach(function (s) {
+          var isDone = false;
+          var order = ['setup', 'lesson', 'assess', 'report'];
+          if (order.indexOf(s.getAttribute('data-step')) < order.indexOf(activeStep)) isDone = true;
+          s.classList.toggle('active', s.getAttribute('data-step') === activeStep);
+          s.classList.toggle('done', isDone && s.getAttribute('data-step') !== activeStep);
+        });
+      }
+      setInterval(updateFlowRail, 700);
+
+      /* ==================== Confetti Celebration ==================== */
+      function confettiBurst(durationMs) {
+        var colors = ['#7c6cff', '#31d0ff', '#ff5ca8', '#2fe6a8', '#ffc24d'];
+        var container = document.createElement('div');
+        container.className = 'confetti-layer';
+        container.setAttribute('aria-hidden', 'true');
+        for (var i = 0; i < 46; i++) {
+          var bit = document.createElement('span');
+          bit.className = 'confetti-bit';
+          bit.style.left = (Math.random() * 100) + 'vw';
+          bit.style.background = colors[i % colors.length];
+          bit.style.animationDelay = (Math.random() * 0.9) + 's';
+          bit.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+          var size = 6 + Math.random() * 7;
+          bit.style.width = size + 'px';
+          bit.style.height = (size * (Math.random() > 0.5 ? 1 : 0.45)) + 'px';
+          container.appendChild(bit);
+        }
+        document.body.appendChild(container);
+        setTimeout(function () { container.remove(); }, durationMs || 4200);
+      }
+      window.confettiBurst = confettiBurst;
+
       /* Update Auth UI */
       function updateAuthUI() {
         if (currentUser) {
@@ -1784,18 +1938,8 @@
           });
           if (!profileRes.ok) { throw new Error('Failed to save profile'); }
 
-          var planRes = await fetch('/api/lesson/plan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(values)
-          });
-
-          if (!planRes.ok) {
-            var body = await planRes.json();
-            throw new Error((body && body.error) || 'Failed to generate lesson plan');
-          }
-
-          var plan = await planRes.json();
+          startBtn.textContent = 'Writing your lesson live…';
+          var plan = await generateLessonViaStream(values);
 
           // Auto-save session state for recovery
           localStorage.setItem('ai_teacher_saved_plan', JSON.stringify(plan));
@@ -1811,6 +1955,90 @@
           startBtn.textContent = 'Start Personalized Lesson 🚀';
         }
       });
+
+      /* -------- SSE lesson generation: the lesson writes itself live -------- */
+      function ensureStreamPanel() {
+        var panel = document.getElementById('lessonStreamPanel');
+        if (!panel) {
+          panel = document.createElement('div');
+          panel.id = 'lessonStreamPanel';
+          panel.className = 'lesson-stream-panel hidden';
+          panel.innerHTML = '<div class="lesson-stream-head"><span class="stream-dot"></span><span id="lessonStreamStatus">The AI is writing your lesson…</span></div>' +
+            '<pre id="lessonStreamText" class="lesson-stream-text"></pre>';
+          wizardScreen.appendChild(panel);
+        }
+        return panel;
+      }
+
+      async function generateLessonViaStream(values) {
+        var panel = ensureStreamPanel();
+        var statusEl = document.getElementById('lessonStreamStatus');
+        var textEl = document.getElementById('lessonStreamText');
+        panel.classList.remove('hidden');
+        textEl.textContent = '';
+        statusEl.textContent = 'The AI is writing your lesson…';
+
+        var response = await fetch('/api/lesson/plan/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+          body: JSON.stringify(values)
+        });
+
+        if (!response.ok || !response.body) {
+          var errBody = {};
+          try { errBody = await response.json(); } catch (e) { /* non-JSON error */ }
+          panel.classList.add('hidden');
+          throw new Error((errBody && errBody.error) || 'Failed to generate lesson plan');
+        }
+
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = '';
+        var plan = null;
+        var failure = null;
+        var shownChars = 0;
+
+        function handleEvent(chunk) {
+          var eventName = 'message';
+          var dataLines = [];
+          chunk.split('\n').forEach(function (line) {
+            if (line.startsWith('event:')) { eventName = line.slice(6).trim(); }
+            else if (line.startsWith('data:')) { dataLines.push(line.slice(5).trim()); }
+          });
+          if (!dataLines.length) return;
+          var data;
+          try { data = JSON.parse(dataLines.join('\n')); } catch (e) { return; }
+
+          if (eventName === 'delta' && data.text) {
+            // Keep the visible tail bounded — the plan event carries the real content.
+            textEl.textContent += data.text;
+            shownChars += data.text.length;
+            if (textEl.textContent.length > 600) {
+              textEl.textContent = textEl.textContent.slice(-600);
+            }
+          } else if (eventName === 'plan') {
+            plan = data;
+          } else if (eventName === 'error') {
+            failure = new Error(data.error || 'Failed to generate lesson plan');
+          }
+        }
+
+        while (true) {
+          var read = await reader.read();
+          if (read.done) break;
+          buffer += decoder.decode(read.value, { stream: true });
+          var sep;
+          while ((sep = buffer.indexOf('\n\n')) >= 0) {
+            handleEvent(buffer.slice(0, sep));
+            buffer = buffer.slice(sep + 2);
+          }
+        }
+
+        panel.classList.add('hidden');
+        if (failure) throw failure;
+        if (!plan) throw new Error('The AI stream ended before the lesson was complete. Please retry.');
+        return plan;
+      }
 
       /* Helper utility */
       function escapeHtml(text) {

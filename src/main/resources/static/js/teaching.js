@@ -88,6 +88,7 @@ window.AiTeacherTeaching = (function () {
       'ts-question-area', 'ts-question-loading', 'ts-question-content',
       'ts-question-text', 'ts-mcq-options', 'ts-short-answer', 'ts-answer-input',
       'ts-question-error', 'ts-submit-answer',
+      'ts-ask-input', 'ts-ask-send', 'ts-ask-response', 'ts-ask-response-text',
       'ts-evaluation-loading', 'ts-feedback', 'ts-feedback-banner',
       'ts-feedback-text', 'ts-feedback-concept', 'ts-continue-lesson',
       'ts-adaptive-area', 'ts-adaptive-loading', 'ts-adaptive-content',
@@ -142,9 +143,11 @@ window.AiTeacherTeaching = (function () {
 
     if (state === 'transition') {
       var figure = els['ts-avatar'].querySelector('.teacher-figure');
-      figure.style.animation = 'none';
-      void figure.offsetWidth;
-      figure.style.animation = '';
+      if (figure) {
+        figure.style.animation = 'none';
+        void figure.offsetWidth;
+        figure.style.animation = '';
+      }
       transitionTimer = setTimeout(function () {
         avatarState('teaching');
       }, 520);
@@ -262,12 +265,14 @@ window.AiTeacherTeaching = (function () {
       if (stopBtn) stopBtn.disabled = false;
       if (statusEl) statusEl.textContent = UI.speaking;
       avatarState('teaching');
+      teacherSpeaking(true);
     } else if (state === 'paused') {
       playPauseBtn.innerHTML = '<span aria-hidden="true">▶</span> ' + UI.resumeVoice;
       playPauseBtn.classList.remove('btn-voice-pause');
       playPauseBtn.classList.add('btn-voice-play');
       if (statusEl) statusEl.textContent = UI.paused;
       avatarState('paused');
+      teacherSpeaking(false);
     } else {
       // idle
       playPauseBtn.innerHTML = '<span aria-hidden="true">▶</span> ' + UI.playVoice;
@@ -275,8 +280,108 @@ window.AiTeacherTeaching = (function () {
       playPauseBtn.classList.add('btn-voice-play');
       if (stopBtn) stopBtn.disabled = true;
       if (statusEl) statusEl.textContent = '';
+      teacherSpeaking(false);
+      scheduleAutoplayAdvance();
       // Don't override avatar state if we're in transition or teaching
     }
+  }
+
+  /* -------- Lifelike teacher lip-sync driven by speech word boundaries -------- */
+  var teacherIsSpeaking = false;
+  var mouthResetTimer = null;
+
+  function teacherSpeaking(isSpeaking) {
+    teacherIsSpeaking = isSpeaking;
+    if (!isSpeaking) {
+      els['ts-avatar'].removeAttribute('data-speaking');
+    }
+  }
+
+  function pulseMouthOnWord() {
+    if (!teacherIsSpeaking) return;
+    var avatar = els['ts-avatar'];
+    avatar.setAttribute('data-speaking', 'true');
+    if (mouthResetTimer) clearTimeout(mouthResetTimer);
+    mouthResetTimer = setTimeout(function () {
+      avatar.removeAttribute('data-speaking');
+    }, 260);
+  }
+
+  /* -------- Ask the teacher: grounded mid-lesson Q&A in persona -------- */
+  function askTeacher() {
+    var input = els['ts-ask-input'];
+    var question = (input.value || '').trim();
+    if (!question || !lesson) return;
+
+    var responseEl = els['ts-ask-response'];
+    var textEl = els['ts-ask-response-text'];
+    var section = lesson.sections[step - 1] || {};
+
+    input.value = '';
+    textEl.textContent = '…';
+    responseEl.classList.remove('hidden');
+    avatarState('thinking');
+
+    fetch('/api/lesson/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: question,
+        topic: lesson.topic || lesson.lessonTitle || '',
+        sectionTitle: section.title || '',
+        sectionContent: section.explanation || section.description || '',
+        persona: profile ? profile.persona : 'chopper',
+        language: lesson.language || 'English'
+      })
+    })
+      .then(function (res) {
+        return res.json().then(function (body) { return { ok: res.ok, body: body }; });
+      })
+      .then(function (result) {
+        if (!result.ok) {
+          throw new Error((result.body && result.body.error) || 'The teacher could not answer right now.');
+        }
+        textEl.textContent = result.body.answer;
+        avatarState('teaching');
+        speakText(result.body.answer, lesson.language || 'English');
+      })
+      .catch(function (err) {
+        textEl.textContent = err.message || 'The teacher could not answer right now.';
+        avatarState('idle');
+      });
+  }
+
+  /* -------- Autoplay: hands-free advance when narration ends -------- */
+  var autoplayEnabled = false;
+  var autoplayTimer = null;
+
+  function scheduleAutoplayAdvance() {
+    if (autoplayTimer) { clearTimeout(autoplayTimer); autoplayTimer = null; }
+    if (!autoplayEnabled) return;
+    autoplayTimer = setTimeout(function () {
+      autoplayTimer = null;
+      if (!autoplayEnabled || isFinish()) return;
+      // Never skip a check question — the student must answer it themselves
+      if (isSection() && !questionAnswered) return;
+      var nextBtn = els['ts-next'];
+      if (nextBtn && !nextBtn.disabled && !nextBtn.classList.contains('hidden')) {
+        nextBtn.click();
+      }
+    }, 1400);
+  }
+
+  /* -------- Live status cycler for AI-loading moments -------- */
+  function cycleStatus(loadingEl, phrases) {
+    if (!loadingEl) return function () {};
+    var statusSpan = loadingEl.querySelector('span:last-child');
+    if (!statusSpan) return function () {};
+    var i = 0;
+    statusSpan.textContent = phrases[0];
+    var t = setInterval(function () {
+      i = (i + 1) % phrases.length;
+      statusSpan.textContent = phrases[i];
+    }, 1900);
+    return function () { clearInterval(t); };
   }
 
   function showSubtitle(text) {
@@ -337,18 +442,18 @@ window.AiTeacherTeaching = (function () {
       updateVoiceUI(state);
     });
 
-    // Set up boundary callback for subtitle sync
+    // Set up boundary callback for subtitle sync + lip sync pulse
     speech.setOnBoundary(function (charIndex, charLength) {
-      if (currentSubtitleText) {
-        // Show a portion of the text around the current position
-        var start = Math.max(0, charIndex - 50);
-        var end = Math.min(currentSubtitleText.length, charIndex + charLength + 150);
-        var displayText = currentSubtitleText.substring(start, end);
-        if (start > 0) displayText = '…' + displayText;
-        if (end < currentSubtitleText.length) displayText = displayText + '…';
-        if (els['ts-subtitle']) {
-          els['ts-subtitle'].textContent = displayText;
-        }
+      pulseMouthOnWord();
+      if (currentSubtitleText && els['ts-subtitle']) {
+        // Karaoke captions: highlight the word currently being spoken
+        var from = Math.max(0, charIndex - 60);
+        var to = Math.min(currentSubtitleText.length, charIndex + charLength + 140);
+        var before = escapeHtml(currentSubtitleText.slice(from, charIndex));
+        var word = escapeHtml(currentSubtitleText.slice(charIndex, charIndex + charLength));
+        var after = escapeHtml(currentSubtitleText.slice(charIndex + charLength));
+        els['ts-subtitle'].innerHTML =
+          (from > 0 ? '…' : '') + before + '<mark class="karaoke-word">' + word + '</mark>' + after + (to < currentSubtitleText.length ? '…' : '');
       }
     });
 
@@ -363,6 +468,18 @@ window.AiTeacherTeaching = (function () {
     if (els['ts-voice-stop']) {
       els['ts-voice-stop'].addEventListener('click', function () {
         stopSpeech();
+      });
+    }
+
+    // Autoplay toggle: auto-advance when narration ends (never skips questions)
+    var autoBtn = document.getElementById('ts-autoplay');
+    if (autoBtn) {
+      autoBtn.addEventListener('click', function () {
+        autoplayEnabled = !autoplayEnabled;
+        autoBtn.classList.toggle('active', autoplayEnabled);
+        autoBtn.setAttribute('aria-pressed', autoplayEnabled ? 'true' : 'false');
+        if (window.showToast) window.showToast(autoplayEnabled ? 'Autoplay on — sections advance when narration ends' : 'Autoplay off', 'info');
+        if (autoplayEnabled) scheduleAutoplayAdvance();
       });
     }
 
@@ -471,6 +588,12 @@ window.AiTeacherTeaching = (function () {
     resetQuestionState();
     els['ts-question-area'].classList.remove('hidden');
     els['ts-question-loading'].classList.remove('hidden');
+    avatarState('thinking');
+    var stopQuestionCycler = cycleStatus(els['ts-question-loading'], [
+      'Analyzing the section…',
+      'Drafting your question…',
+      'Calibrating the challenge…'
+    ]);
 
     var requestBody = {
       topic: lesson.topic || lesson.lessonTitle,
@@ -486,26 +609,84 @@ window.AiTeacherTeaching = (function () {
     };
 
     try {
-      var res = await fetch('/api/lesson/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!res.ok) {
-        var errorBody;
-        try { errorBody = await res.json(); } catch (e) { /* ignore */ }
-        throw new Error((errorBody && errorBody.error) || UI.questionLoadError);
-      }
-
-      currentQuestion = await res.json();
+      currentQuestion = await streamQuestion(requestBody);
+      stopQuestionCycler();
       displayQuestion(currentQuestion);
     } catch (err) {
+      stopQuestionCycler();
       els['ts-question-loading'].classList.add('hidden');
       els['ts-question-error'].textContent = err.message || UI.questionLoadError;
       els['ts-question-error'].classList.remove('hidden');
       showContinueButton();
     }
+  }
+
+  /* -------- SSE question generation: the check question types itself in live -------- */
+  async function streamQuestion(requestBody) {
+    var loading = els['ts-question-loading'];
+    var streamEl = document.createElement('pre');
+    streamEl.className = 'question-stream-text';
+    loading.appendChild(streamEl);
+
+    var cleanup = function () { if (streamEl.parentNode) streamEl.parentNode.removeChild(streamEl); };
+
+    var response = await fetch('/api/lesson/question/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok || !response.body) {
+      cleanup();
+      var errBody = {};
+      try { errBody = await response.json(); } catch (e) { /* non-JSON error */ }
+      throw new Error((errBody && errBody.error) || UI.questionLoadError);
+    }
+
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    var question = null;
+    var failure = null;
+
+    function handleEvent(chunk) {
+      var eventName = 'message';
+      var dataLines = [];
+      chunk.split('\n').forEach(function (line) {
+        if (line.startsWith('event:')) { eventName = line.slice(6).trim(); }
+        else if (line.startsWith('data:')) { dataLines.push(line.slice(5).trim()); }
+      });
+      if (!dataLines.length) return;
+      var data;
+      try { data = JSON.parse(dataLines.join('\n')); } catch (e) { return; }
+
+      if (eventName === 'delta' && data.text) {
+        streamEl.textContent += data.text;
+        if (streamEl.textContent.length > 400) {
+          streamEl.textContent = streamEl.textContent.slice(-400);
+        }
+      } else if (eventName === 'question') {
+        question = data;
+      } else if (eventName === 'error') {
+        failure = new Error(data.error || UI.questionLoadError);
+      }
+    }
+
+    while (true) {
+      var read = await reader.read();
+      if (read.done) break;
+      buffer += decoder.decode(read.value, { stream: true });
+      var sep;
+      while ((sep = buffer.indexOf('\n\n')) >= 0) {
+        handleEvent(buffer.slice(0, sep));
+        buffer = buffer.slice(sep + 2);
+      }
+    }
+
+    cleanup();
+    if (failure) throw failure;
+    if (!question) throw new Error(UI.questionLoadError);
+    return question;
   }
 
   /* ======================== Display Question ======================== */
@@ -582,6 +763,12 @@ window.AiTeacherTeaching = (function () {
     els['ts-evaluation-loading'].classList.remove('hidden');
     els['ts-submit-answer'].disabled = true;
     els['ts-submit-answer'].textContent = UI.evaluating;
+    avatarState('evaluating');
+    var stopEvalCycler = cycleStatus(els['ts-evaluation-loading'], [
+      'Reading your answer…',
+      'Checking your reasoning…',
+      'Preparing feedback…'
+  ]);
 
     var section = lesson.sections[step - 1] || {};
     var sectionContent = section.explanation || section.description || '';
@@ -681,6 +868,7 @@ window.AiTeacherTeaching = (function () {
     els['ts-adaptive-area'].classList.remove('hidden');
     els['ts-adaptive-loading'].classList.remove('hidden');
     els['ts-adaptive-loading'].querySelector('span:last-child').textContent = UI.analyzing;
+    avatarState('thinking');
 
     var section = lesson.sections[step - 1] || {};
 
@@ -739,6 +927,7 @@ window.AiTeacherTeaching = (function () {
   async function generateAdaptation(studentAnswer, sectionContent) {
     els['ts-adaptive-loading'].classList.remove('hidden');
     els['ts-adaptive-loading'].querySelector('span:last-child').textContent = UI.adapting;
+    avatarState('thinking');
 
     var section = lesson.sections[step - 1] || {};
 
@@ -1100,7 +1289,42 @@ window.AiTeacherTeaching = (function () {
       atomicContainer.className = 'atomic-orbit-3d';
       atomicContainer.innerHTML = '<div class="atomic-ring"></div><div class="atomic-nucleus">⚛️</div>';
       container.appendChild(atomicContainer);
+      // Concept constellation: key words from the section title orbit as chips
+      var keyWords = String(title || '').split(/\s+/).filter(function (w) { return w.length > 3; }).slice(0, 4);
+      if (keyWords.length) {
+        var chips = document.createElement('div');
+        chips.className = 'concept-chips';
+        keyWords.forEach(function (w, i) {
+          var chip = document.createElement('span');
+          chip.className = 'concept-chip';
+          chip.style.animationDelay = (i * 0.35) + 's';
+          chip.textContent = w;
+          chips.appendChild(chip);
+        });
+        container.appendChild(chips);
+      }
     }
+  }
+
+  /* -------- Visual lesson flow: explanation rendered as a step-by-step
+     storyboard inside the visual stage (every lesson gets visuals) -------- */
+  function renderVisualFlow(section) {
+    var container = $('interactiveVisualWidget');
+    if (!container) return;
+    var text = String(section.explanation || section.description || '');
+    if (!text.trim()) return;
+    var sentences = text.split(/(?<=[.!?])\s+/).filter(function (s) { return s.trim().length > 0; }).slice(0, 4);
+    if (sentences.length < 2) return;
+    var flow = document.createElement('div');
+    flow.className = 'visual-flow';
+    sentences.forEach(function (s, i) {
+      var card = document.createElement('div');
+      card.className = 'visual-flow-card';
+      card.style.animationDelay = (i * 0.18) + 's';
+      card.innerHTML = '<span class="visual-flow-num">' + (i + 1) + '</span><span class="visual-flow-text">' + escapeHtml(s.trim()) + '</span>';
+      flow.appendChild(card);
+    });
+    container.appendChild(flow);
   }
 
   function getPersonaAvatarSvg(personaVal) {
@@ -1146,6 +1370,7 @@ window.AiTeacherTeaching = (function () {
 
   function applyTeacherPersonaStyling() {
     var personaVal = (profile && profile.persona) ? profile.persona : 'chopper';
+    document.body.setAttribute('data-persona', personaVal);
     var iconEl = $('animeAvatarIconDisplay');
     var nameEl = $('animeAvatarNameDisplay');
     var particlesEl = $('ts-bubble-particles');
@@ -1171,8 +1396,6 @@ window.AiTeacherTeaching = (function () {
         if (nameEl) nameEl.textContent = 'Chopper';
         if (particlesEl) particlesEl.textContent = '🌸';
       }
-    }
-  }
     }
   }
 
@@ -1239,6 +1462,7 @@ window.AiTeacherTeaching = (function () {
     els['ts-visual-title'].textContent = title;
     els['ts-visual-note'].textContent = UI.teaching;
     renderInteractiveWidget(section.visualHint, title);
+    renderVisualFlow(section);
 
     var bubbleText = els['ts-bubble'].querySelector('#ts-bubble-text');
     if (bubbleText) bubbleText.textContent = UI.teaching;
@@ -1449,6 +1673,25 @@ window.AiTeacherTeaching = (function () {
     els['ts-adaptive-continue'].onclick = function () {
       advanceToNextStep();
     };
+
+    // Ask-the-teacher: free-form mid-lesson Q&A
+    els['ts-ask-send'].onclick = askTeacher;
+    els['ts-ask-input'].addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        askTeacher();
+      }
+    });
+
+    // Voice input: mic buttons fill the answer textareas
+    if (window.AiTeacherVoiceInput) {
+      var lessonLang = function () {
+        var map = { 'English': 'en-US', 'Hindi': 'hi-IN', 'Kannada': 'kn-IN' };
+        return map[(lesson && lesson.language) || 'English'] || 'en-US';
+      };
+      window.AiTeacherVoiceInput.attach(document.getElementById('ts-answer-mic'), els['ts-answer-input'], { lang: lessonLang });
+      window.AiTeacherVoiceInput.attach(document.getElementById('ts-adaptive-answer-mic'), els['ts-adaptive-answer-input'], { lang: lessonLang });
+    }
 
     // Phase 9: Initialize voice controls
     initVoiceControls();

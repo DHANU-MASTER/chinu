@@ -91,6 +91,11 @@ window.AiTeacherProgress = (function () {
     // Summary cards
     renderSummaryCards(summary);
 
+    // Visual analytics: score trend + study heat + badges
+    renderScoreSparkline(summary.recentActivity || []);
+    renderStreakHeat(summary.recentActivity || []);
+    renderAchievementBadges(summary);
+
     // History table
     renderHistoryTable(summary.recentActivity || []);
 
@@ -145,6 +150,8 @@ window.AiTeacherProgress = (function () {
     }
 
     // Empty state
+    var vizRow = $('progress-viz-row');
+    if (vizRow) vizRow.classList.toggle('hidden', summary.totalLessonsCompleted === 0);
     if (summary.totalLessonsCompleted === 0) {
       els['progress-empty-state'].classList.remove('hidden');
       els['progress-summary-cards'].classList.add('hidden');
@@ -152,6 +159,83 @@ window.AiTeacherProgress = (function () {
       els['progress-empty-state'].classList.add('hidden');
       els['progress-summary-cards'].classList.remove('hidden');
     }
+  }
+
+  /* -------- Score-over-time sparkline (inline SVG, zero dependencies) -------- */
+  function renderScoreSparkline(activity) {
+    var box = $('progress-sparkline');
+    if (!box) return;
+    var data = (activity || []).map(function (a) {
+      return Math.max(0, Math.min(100, Number(a.percentage) || 0));
+    }).reverse(); // oldest → newest
+    if (data.length === 0) {
+      box.innerHTML = '<p class="muted">No data yet.</p>';
+      return;
+    }
+    var W = 280, H = 90, P = 8;
+    var stepX = data.length > 1 ? (W - 2 * P) / (data.length - 1) : 0;
+    var pts = data.map(function (v, i) {
+      return [P + i * stepX, H - P - (v / 100) * (H - 2 * P)];
+    });
+    var polyline = pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+    var area = P + ',' + (H - P) + ' ' + polyline + ' ' + (P + (data.length - 1) * stepX).toFixed(1) + ',' + (H - P);
+    var last = pts[pts.length - 1];
+    box.innerHTML =
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" class="sparkline-svg" preserveAspectRatio="none" role="presentation">' +
+      '<defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="rgba(124,108,255,0.35)"/><stop offset="100%" stop-color="rgba(124,108,255,0)"/>' +
+      '</linearGradient></defs>' +
+      '<polygon points="' + area + '" fill="url(#sparkFill)"/>' +
+      '<polyline points="' + polyline + '" fill="none" stroke="#7c6cff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="4" fill="#31d0ff"/>' +
+      '</svg>' +
+      '<div class="sparkline-caption muted">Latest ' + data[data.length - 1] + '% · ' + data.length + ' lesson' + (data.length > 1 ? 's' : '') + '</div>';
+  }
+
+  /* -------- 14-day study activity heat strip -------- */
+  function renderStreakHeat(activity) {
+    var box = $('progress-heat');
+    if (!box) return;
+    var counts = {};
+    (activity || []).forEach(function (a) {
+      var m = String(a.completedAt || '').match(/\d{4}-\d{2}-\d{2}/);
+      if (m) counts[m[0]] = (counts[m[0]] || 0) + 1;
+    });
+    var html = '';
+    for (var i = 13; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      var c = counts[key] || 0;
+      var level = c === 0 ? 0 : c === 1 ? 1 : c < 4 ? 2 : 3;
+      html += '<span class="heat-cell heat-l' + level + '" title="' + key + ': ' + c + ' lesson' + (c === 1 ? '' : 's') + '"></span>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* -------- Achievement badges: unlocked + locked-with-progress -------- */
+  function renderAchievementBadges(summary) {
+    var grid = $('achievementBadgesGrid');
+    if (!grid) return;
+    var total = summary.totalLessonsCompleted || 0;
+    var best = summary.bestScore || 0;
+    var badges = [
+      { icon: '🏅', title: 'First Steps', desc: 'Complete your 1st lesson', unlocked: total >= 1, progress: Math.min(total, 1) * 100, label: total + '/1 lessons' },
+      { icon: '🎯', title: 'Quiz Ace', desc: 'Score 60%+ on an assessment', unlocked: best >= 60, progress: Math.min(100, Math.round((best / 60) * 100)), label: 'best ' + best + '% / 60%' },
+      { icon: '⚡', title: 'Haki Awakened', desc: 'Reach 80%+ mastery', unlocked: best >= 80, progress: Math.min(100, Math.round((best / 80) * 100)), label: 'best ' + best + '% / 80%' },
+      { icon: '📚', title: 'Scholar', desc: 'Complete 5 lessons', unlocked: total >= 5, progress: Math.min(100, Math.round((total / 5) * 100)), label: total + '/5 lessons' }
+    ];
+    grid.innerHTML = badges.map(function (b) {
+      return '<div class="achievement-badge-card ' + (b.unlocked ? 'unlocked' : 'locked') + '">' +
+        '<span class="badge-icon">' + b.icon + '</span>' +
+        '<span class="badge-title">' + b.title + '</span>' +
+        '<span class="badge-desc">' + b.desc + '</span>' +
+        (b.unlocked
+          ? '<span class="badge-state-ok">✓ Unlocked</span>'
+          : '<span class="badge-progress-track"><span class="badge-progress-fill" style="width:' + b.progress + '%"></span></span>' +
+            '<span class="badge-state-locked">' + b.label + '</span>') +
+        '</div>';
+    }).join('');
   }
 
   function renderSummaryCards(summary) {

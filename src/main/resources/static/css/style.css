@@ -1209,11 +1209,790 @@ a:hover {
 .visual-title { font-size: var(--fs-3); font-weight: 800; position: relative; z-index: 1; }
 .visual-note { font-size: var(--fs-small); color: var(--brand-2); position: relative; z-index: 1; }
 
-/* Print Styles */
+/* ==========================================================================
+   7. Lifelike Teacher Figure — layered character animated by speech state
+   ========================================================================== */
+.anime-avatar-artwork {
+  width: auto;
+  height: auto;
+  border-radius: var(--radius);
+  background: none;
+  border: none;
+  box-shadow: none;
+  animation: none;
+  transform-style: flat;
+  perspective: none;
+  padding: 0;
+}
+
+.teacher-figure {
+  position: relative;
+  width: 150px;
+  height: 190px;
+  margin-inline: auto;
+  animation: tf-idle-sway 4.2s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes tf-idle-sway {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-1.2deg); }
+}
+
+/* ---- Head ---- */
+.tf-head {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.25), transparent 55%),
+    radial-gradient(circle at center, rgba(124, 108, 255, 0.35), rgba(13, 20, 40, 0.92));
+  border: 3px solid var(--brand-2);
+  box-shadow: 0 0 24px rgba(49, 208, 255, 0.45), inset 0 0 14px rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: transform 0.35s ease;
+}
+
+.tf-face {
+  font-size: 3.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.55));
+}
+
+/* ---- Torso & arms ---- */
+.tf-torso {
+  position: relative;
+  width: 118px;
+  height: 96px;
+  margin: -14px auto 0;
+  border-radius: 34px 34px 14px 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05) 60%),
+    linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand-2);
+  box-shadow: 0 10px 26px rgba(2, 6, 18, 0.55);
+  z-index: 1;
+}
+
+.tf-arm {
+  position: absolute;
+  top: 16px;
+  width: 20px;
+  height: 62px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  border: 2px solid var(--border-strong);
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.tf-arm-l { left: -16px; transform-origin: 50% 8%; }
+.tf-arm-r { right: -16px; transform-origin: 50% 8%; }
+
+/* ---- Mouth (lip sync) ---- */
+.tf-mouth {
+  position: absolute;
+  left: 50%;
+  bottom: 27px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 8px;
+  border-radius: 0 0 12px 12px;
+  background: rgba(13, 20, 40, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-top: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 3;
+}
+
+/* ---- Aura classes now tint the figure itself ---- */
+.aura-blue .tf-head { border-color: var(--brand-2); box-shadow: 0 0 24px rgba(49, 208, 255, 0.45), inset 0 0 14px rgba(255, 255, 255, 0.18); }
+.aura-blue .tf-torso { border-top-color: var(--brand-2); }
+.aura-red .tf-head { border-color: var(--bad); box-shadow: 0 0 24px rgba(255, 107, 122, 0.45), inset 0 0 14px rgba(255, 255, 255, 0.18); }
+.aura-red .tf-torso { border-top-color: var(--bad); }
+.aura-green .tf-head { border-color: var(--ok); box-shadow: 0 0 24px rgba(47, 230, 168, 0.45), inset 0 0 14px rgba(255, 255, 255, 0.18); }
+.aura-green .tf-torso { border-top-color: var(--ok); }
+
+/* ==========================================================================
+   8. Avatar states — the CSS engine that reacts to data-state
+   ========================================================================== */
+
+/* TEACHING: gesture loop + lip sync + head motion */
+.teach-avatar[data-state="teaching"] .tf-mouth { opacity: 1; animation: tf-lipsync 0.28s ease-in-out infinite; }
+.teach-avatar[data-state="teaching"] .tf-arm-r { animation: tf-gesture 2.4s ease-in-out infinite; }
+.teach-avatar[data-state="teaching"] .tf-head { animation: tf-head-teach 3.4s ease-in-out infinite; }
+
+/* Word-boundary pulses: mouth snaps shut briefly between words (realistic pauses) */
+.teach-avatar[data-state="teaching"][data-speaking] .tf-mouth { animation: tf-word-pulse 0.26s ease-out; }
+
+@keyframes tf-word-pulse {
+  0% { transform: translateX(-50%) scaleY(2.2) scaleX(0.85); }
+  45% { transform: translateX(-50%) scaleY(0.4) scaleX(1.15); }
+  100% { transform: translateX(-50%) scaleY(1.9); }
+}
+
+@keyframes tf-lipsync {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  50% { transform: translateX(-50%) scaleY(2.1) scaleX(0.85); }
+  75% { transform: translateX(-50%) scaleY(0.7) scaleX(1.1); }
+  90% { transform: translateX(-50%) scaleY(1.6); }
+  97% { transform: translateX(-50%) scaleY(0.85); }
+}
+
+@keyframes tf-gesture {
+  0%, 100% { transform: rotate(2deg); }
+  30% { transform: rotate(-46deg) translateY(-4px); }
+  55% { transform: rotate(-20deg) translateY(-2px); }
+  78% { transform: rotate(-52deg) translateY(-5px); }
+}
+
+@keyframes tf-head-teach {
+  0%, 100% { transform: rotate(-3deg); }
+  40% { transform: rotate(3deg) translateY(1px); }
+  70% { transform: rotate(-2deg); }
+}
+
+/* IDLE / LISTENING: arms down, mouth hidden, gentle breathing */
+.teach-avatar[data-state="idle"] .tf-arm-l { animation: tf-breathe 3s ease-in-out infinite; }
+.teach-avatar[data-state="idle"] .tf-arm-r { animation: tf-breathe 3s ease-in-out infinite reverse; }
+
+@keyframes tf-breathe {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(4deg); }
+}
+
+/* PAUSED: everything freezes, head tilts patiently (held keyframes — static transforms are unreliable mid-animation-switch) */
+@keyframes tf-pose-paused-r { 0%, 50%, 100% { transform: rotate(6deg); } }
+@keyframes tf-pose-paused-l { 0%, 50%, 100% { transform: rotate(-3deg); } }
+@keyframes tf-pose-paused-head { 0%, 50%, 100% { transform: rotate(4deg); } }
+.teach-avatar[data-state="paused"] .tf-mouth { opacity: 0; animation: none; }
+.teach-avatar[data-state="paused"] .tf-arm-r { animation: tf-pose-paused-r 3s ease-in-out infinite; }
+.teach-avatar[data-state="paused"] .tf-arm-l { animation: tf-pose-paused-l 3s ease-in-out infinite; }
+.teach-avatar[data-state="paused"] .tf-head { animation: tf-pose-paused-head 3s ease-in-out infinite; }
+
+/* TRANSITION: quick wave-in */
+.teach-avatar[data-state="transition"] .tf-arm-r { animation: tf-wave 0.5s ease-in-out; }
+
+@keyframes tf-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-80deg) translateY(-6px); }
+}
+
+/* THINKING: hand to chin, eyes-up pose */
+@keyframes tf-pose-think-r { 0%, 100% { transform: rotate(-64deg) translateY(-8px); } 50% { transform: rotate(-56deg) translateY(-5px); } }
+.teach-avatar[data-state="thinking"] .tf-mouth { opacity: 0; animation: none; }
+.teach-avatar[data-state="thinking"] .tf-arm-r { animation: tf-pose-think-r 2.6s ease-in-out infinite; }
+.teach-avatar[data-state="thinking"] .tf-head { animation: tf-think-tilt 2.6s ease-in-out infinite; }
+
+@keyframes tf-think-tilt {
+  0%, 100% { transform: rotate(5deg) translateY(-1px); }
+  50% { transform: rotate(8deg) translateY(-3px); }
+}
+
+/* EVALUATING: focused, both arms slightly raised */
+@keyframes tf-pose-eval-l { 0%, 50%, 100% { transform: rotate(14deg); } }
+@keyframes tf-pose-eval-r { 0%, 50%, 100% { transform: rotate(-14deg); } }
+.teach-avatar[data-state="evaluating"] .tf-mouth { opacity: 0; animation: none; }
+.teach-avatar[data-state="evaluating"] .tf-arm-l { animation: tf-pose-eval-l 3s ease-in-out infinite; }
+.teach-avatar[data-state="evaluating"] .tf-arm-r { animation: tf-pose-eval-r 3s ease-in-out infinite; }
+
+/* ==========================================================================
+   9. Classroom stage — full-bleed chalkboard look + caption subtitles
+   ========================================================================== */
+.teaching-screen {
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.teach-stage {
+  position: relative;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(600px 300px at 18% 20%, rgba(124, 108, 255, 0.14), transparent 60%),
+    radial-gradient(500px 260px at 85% 30%, rgba(49, 208, 255, 0.1), transparent 60%),
+    linear-gradient(180deg, #101a33, #0a1122 70%);
+  border: 1px solid var(--border-strong);
+  padding: var(--space-3);
+  overflow: hidden;
+}
+
+.teach-stage::before {
+  content: '';
+  position: absolute;
+  top: -70px;
+  left: 20%;
+  width: 60%;
+  height: 160px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.09), transparent 65%);
+  pointer-events: none;
+}
+
+.teach-subtitle {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  max-width: 88%;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: rgba(5, 8, 18, 0.82);
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-1);
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 22px rgba(2, 6, 18, 0.5);
+}
+
+.teach-subtitle.hidden { display: none; }
+
+/* ==========================================================================
+   10. Print Styles
+   ========================================================================== */
 @media print {
   body { background: #ffffff !important; color: #000000 !important; }
   .topbar, .report-actions, .toast-container, .resume-banner, .modal-footer-actions, .modal-header { display: none !important; }
   .card { border: none !important; box-shadow: none !important; background: transparent !important; }
   .certificate-modal-card { max-width: 100% !important; border: none !important; box-shadow: none !important; }
   .certificate-border { border: 4px double #1a2238 !important; color: #1a2238 !important; }
+  .teach-stage { background: #ffffff !important; }
+  .teach-subtitle { position: static; background: transparent; border: none; box-shadow: none; color: #000 !important; }
+}
+
+/* ==========================================================================
+   11. Industry-pass UI: auth split screen, flow rail, visual lessons,
+       dashboard analytics, celebrations
+   ========================================================================== */
+
+/* ---- Screen width utility classes (replace inline styles) ---- */
+.screen-narrow { max-width: 660px; margin-inline: auto; }
+.screen-wide { max-width: 860px; margin-inline: auto; }
+.screen-stage { max-width: 880px; margin-inline: auto; }
+
+.field-hint { font-size: 0.78rem; margin-top: 4px; }
+
+/* ---- Auth: split brand panel + form panel ---- */
+.auth-screen {
+  max-width: 920px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  padding: 0;
+  overflow: hidden;
+}
+
+.auth-screen .auth-header { padding-top: 4px; }
+.auth-logo-sm { font-size: 2.2rem; }
+
+.auth-brand {
+  position: relative;
+  background:
+    radial-gradient(500px 300px at 20% 15%, rgba(124, 108, 255, 0.4), transparent 60%),
+    radial-gradient(400px 260px at 85% 80%, rgba(49, 208, 255, 0.28), transparent 60%),
+    linear-gradient(160deg, #171f3f, #0a1122 70%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+
+.auth-brand-inner {
+  position: relative;
+  padding: 40px 32px;
+  z-index: 1;
+}
+
+.auth-brand .auth-logo { font-size: 3rem; display: inline-block; animation: floatAvatar 3.5s ease-in-out infinite; }
+.auth-brand-title {
+  font-size: var(--fs-2);
+  margin: 10px 0 6px;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.auth-tagline { color: var(--ink-2); font-size: 0.95rem; line-height: 1.6; margin-bottom: 22px; }
+
+.auth-features { list-style: none; display: grid; gap: 14px; }
+.auth-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.feature-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  flex: none;
+}
+
+.auth-brand-glow {
+  position: absolute;
+  inset: auto -30% -40% -30%;
+  height: 60%;
+  background: radial-gradient(closest-side, rgba(124, 108, 255, 0.22), transparent);
+  pointer-events: none;
+}
+
+.auth-panel { padding: 36px 30px; display: flex; flex-direction: column; }
+.auth-panel .stack { flex: none; }
+
+@media (max-width: 760px) {
+  .auth-screen { grid-template-columns: 1fr; max-width: 480px; }
+  .auth-brand { display: none; }
+  .auth-panel { padding: 26px 20px; }
+}
+
+/* ---- Auth tabs: proper segmented control ---- */
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+.auth-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-tab:hover { color: var(--ink-1); }
+
+.auth-tab.active {
+  background: var(--grad-brand);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(124, 108, 255, 0.4);
+}
+
+/* ---- Auth divider + demo button ---- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.btn-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed var(--border-strong);
+  color: var(--ink-2);
+  font-weight: 700;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.btn-demo:hover { border-color: var(--brand-2); color: var(--ink-1); background: rgba(49, 208, 255, 0.08); }
+
+/* ---- Flow rail ---- */
+.flow-rail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.flow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-3);
+  transition: color 0.25s ease;
+}
+
+.flow-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.flow-sep { width: 22px; height: 1px; background: var(--border); }
+
+.flow-step.active { color: var(--ink-1); }
+.flow-step.active .flow-dot { background: var(--brand-2); box-shadow: 0 0 10px rgba(49, 208, 255, 0.8); }
+.flow-step.done { color: var(--ok); }
+.flow-step.done .flow-dot { background: var(--ok); }
+
+/* ---- Karaoke captions ---- */
+.karaoke-word {
+  background: transparent;
+  color: var(--brand-2);
+  font-weight: 800;
+  text-shadow: 0 0 14px rgba(49, 208, 255, 0.6);
+}
+
+/* ---- Autoplay button ---- */
+.btn-autoplay { border: 1px solid var(--border); }
+.btn-autoplay.active {
+  background: rgba(47, 230, 168, 0.16);
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+/* ---- Visual lesson flow storyboard (inside the visual stage) ---- */
+.visual-flow {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  margin-top: 14px;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+}
+
+.visual-flow-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-1);
+  animation: flow-card-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+.visual-flow-num {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes flow-card-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---- Concept constellation chips ---- */
+.concept-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+.concept-chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(124, 108, 255, 0.14);
+  border: 1px solid rgba(124, 108, 255, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  animation: chip-float 3.4s ease-in-out infinite backwards;
+}
+
+@keyframes chip-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ---- Dashboard: sparkline + heat strip ---- */
+.progress-viz-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) { .progress-viz-row { grid-template-columns: 1fr; } }
+
+.sparkline-box { min-height: 96px; display: flex; flex-direction: column; justify-content: center; }
+.sparkline-svg { width: 100%; height: 96px; }
+.sparkline-caption { font-size: 0.75rem; margin-top: 6px; }
+
+.heat-strip { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.heat-cell {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease;
+}
+
+.heat-cell:hover { transform: scale(1.15); }
+.heat-l1 { background: rgba(255, 107, 122, 0.35); border-color: rgba(255, 107, 122, 0.5); }
+.heat-l2 { background: rgba(255, 92, 168, 0.55); border-color: rgba(255, 92, 168, 0.7); }
+.heat-l3 { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(255, 92, 168, 0.5); }
+
+.heat-legend { font-size: 0.72rem; margin-top: 8px; }
+
+/* ---- Badges: locked + progress ---- */
+.achievement-badge-card.locked {
+  opacity: 0.75;
+  filter: saturate(0.4);
+  border-style: dashed;
+}
+
+.badge-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.badge-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--grad-brand);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.badge-state-ok { font-size: 0.72rem; font-weight: 800; color: var(--ok); margin-top: 6px; }
+.badge-state-locked { font-size: 0.72rem; font-weight: 700; color: var(--ink-3); margin-top: 6px; }
+
+/* ---- Confetti celebration ---- */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-bit {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(680deg); opacity: 0; }
+}
+
+/* ---- Timetable today highlight ---- */
+.day-card.today {
+  border-color: var(--brand-2);
+  box-shadow: 0 0 18px rgba(49, 208, 255, 0.22), inset 0 0 20px rgba(49, 208, 255, 0.05);
+}
+
+.day-card.today .day-card-header { color: var(--brand-2); }
+
+/* ---- Persona accent on the whole page (body-level theming) ---- */
+body[data-persona="shanks"] .karaoke-word { color: var(--bad); text-shadow: 0 0 14px rgba(255, 107, 122, 0.6); }
+body[data-persona="lucky_roux"] .karaoke-word { color: var(--ok); text-shadow: 0 0 14px rgba(47, 230, 168, 0.6); }
+body[data-persona="shanks"] .flow-step.active .flow-dot { background: var(--bad); box-shadow: 0 0 10px rgba(255, 107, 122, 0.8); }
+body[data-persona="lucky_roux"] .flow-step.active .flow-dot { background: var(--ok); box-shadow: 0 0 10px rgba(47, 230, 168, 0.8); }
+
+/* ---- Reduced motion: respect user preference ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   12. Voice input + Ask the teacher
+   ========================================================================== */
+.voice-input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.voice-input-row .textarea { flex: 1; }
+
+.btn-mic {
+  flex: none;
+  width: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-1);
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-mic:hover { border-color: var(--brand-2); background: rgba(49, 208, 255, 0.08); }
+
+.btn-mic.listening {
+  border-color: var(--bad);
+  background: rgba(255, 107, 122, 0.14);
+  animation: mic-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 122, 0.45); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 107, 122, 0); }
+}
+
+.ask-area {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.ask-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ask-row .input { flex: 1; }
+
+.ask-response {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(124, 108, 255, 0.1);
+  border: 1px solid rgba(124, 108, 255, 0.3);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-1);
+  animation: flow-card-in 0.35s ease backwards;
+}
+
+.ask-avatar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   13. Live lesson streaming panel (SSE)
+   ========================================================================== */
+.lesson-stream-panel {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(5, 8, 18, 0.55);
+  border: 1px solid var(--border);
+}
+
+.lesson-stream-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+
+.stream-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: status-pulse 1.2s infinite;
+}
+
+.lesson-stream-text {
+  margin: 0;
+  max-height: 140px;
+  overflow: hidden;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--ink-3);
+  white-space: pre-wrap;
+  word-break: break-word;
+  mask-image: linear-gradient(180deg, transparent, #000 26%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 26%);
+}
+
+.question-stream-text {
+  margin: 10px 0 0;
+  max-height: 90px;
+  overflow: hidden;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--ink-3);
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+  mask-image: linear-gradient(180deg, transparent, #000 30%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%);
 }

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1428" />
+  <title>AI Teacher — Learn Anything with a Personal AI Teacher</title>
+  <meta name="description" content="Animated visual lessons, live AI narration in 3 languages, adaptive re-teaching and mastery certificates. Installable, free to try — no account needed." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .landing-hero { max-width: 980px; margin: 0 auto; text-align: center; padding: 72px 20px 40px; }
+    .landing-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      background: rgba(124, 108, 255, 0.14); border: 1px solid rgba(124, 108, 255, 0.4);
+      font-size: 0.8rem; font-weight: 700; color: var(--ink-2); margin-bottom: 22px;
+    }
+    .landing-title {
+      font-size: clamp(2.2rem, 5.4vw + 1rem, 4.2rem);
+      line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 18px;
+    }
+    .landing-title .grad { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .landing-sub { color: var(--ink-2); font-size: 1.08rem; max-width: 620px; margin: 0 auto 34px; line-height: 1.65; }
+    .landing-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 26px; }
+    .btn-cta { padding: 14px 28px; font-size: 1rem; border-radius: 14px; }
+    .landing-note { color: var(--ink-3); font-size: 0.82rem; }
+    .landing-features { max-width: 980px; margin: 30px auto 60px; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+    .landing-card { padding: 22px 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-align: left; }
+    .landing-card .ico { font-size: 1.7rem; display: block; margin-bottom: 12px; }
+    .landing-card h3 { font-size: 1rem; margin: 0 0 6px; }
+    .landing-card p { color: var(--ink-2); font-size: 0.85rem; line-height: 1.55; margin: 0; }
+    .landing-footer { text-align: center; color: var(--ink-3); font-size: 0.8rem; padding: 26px 0 40px; }
+    @media (max-width: 640px) { .landing-hero { padding-top: 48px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="landing.html" aria-label="AI Teacher home">
+      <span class="brand-mark" aria-hidden="true">🧑‍🏫</span>
+      <span>AI&nbsp;Teacher</span>
+    </a>
+    <div class="topbar-actions">
+      <a class="btn btn-ghost btn-sm" href="index.html">Sign in →</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="landing-hero">
+      <span class="landing-badge">🎓 Free to try · No account needed · Installable</span>
+      <h1 class="landing-title">Learn anything from a<br /><span class="grad">personal AI teacher</span></h1>
+      <p class="landing-sub">
+        Pick an anime persona, drop in any topic or your own PDF, and get a live lesson with
+        animated visuals, voice narration, adaptive re-teaching when you're stuck, and a
+        certificate when you master it.
+      </p>
+      <div class="landing-ctas">
+        <a class="btn btn-primary btn-cta" href="index.html?demo=1">🎬 Try a Demo Lesson</a>
+        <a class="btn btn-ghost btn-cta" href="index.html">Create free account</a>
+      </div>
+      <p class="landing-note">Works in your browser · English, Hindi & Kannada · Your progress stays yours</p>
+    </section>
+
+    <section class="landing-features">
+      <div class="landing-card">
+        <span class="ico">🎬</span>
+        <h3>Lessons that move</h3>
+        <p>Every topic gets an animated visual stage — DNA helices, force simulators, call stacks, orbiting concepts.</p>
+      </div>
+      <div class="landing-card">
+        <span class="ico">🎙️</span>
+        <h3>Talk &amp; listen</h3>
+        <p>Live narration with karaoke captions in 3 languages — and answer check questions by voice.</p>
+      </div>
+      <div class="landing-card">
+        <span class="ico">🧠</span>
+        <h3>Adapts when you're stuck</h3>
+        <p>Misconception detection re-teaches the concept differently until it clicks. Ask the teacher anything mid-lesson.</p>
+      </div>
+      <div class="landing-card">
+        <span class="ico">📜</span>
+        <h3>Proof of mastery</h3>
+        <p>Streaks, achievement badges, progress analytics and a printable Certificate of AI Mastery.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">AI Teacher — Autonomous Multimodal Pedagogical Platform</footer>
+</body>
+</html>

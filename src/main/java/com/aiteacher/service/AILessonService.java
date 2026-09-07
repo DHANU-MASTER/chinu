@@ -88,15 +88,39 @@ public class AILessonService implements AIService {
 			throw AiException.unavailable("AI lesson generation is not configured: the AI_API_KEY environment variable is not set.");
 		}
 
-		String outputLanguage = languageName(profile.getLanguage());
-		boolean hasMaterial = profile.getUploadedMaterial() != null && !profile.getUploadedMaterial().isBlank();
-		List<ChatMessage> messages = List.of(
-				ChatMessage.system(buildSystemPrompt(outputLanguage, hasMaterial)),
-				ChatMessage.user(buildUserPrompt(profile)));
-
-		String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, messages);
+		String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(profile));
 
 		return parseLesson(profile, rawContent);
+	}
+
+	/**
+	 * Streaming variant of {@link #generateLesson(StudentProfileRequest)}: the
+	 * provider's raw completion is consumed token-by-token and forwarded to the
+	 * given listener (so the UI can render the lesson while it is written),
+	 * then the fully accumulated text is parsed into the validated plan.
+	 */
+	public LessonPlanResponse generateLessonStreaming(StudentProfileRequest profile,
+			java.util.function.Consumer<String> onDelta) {
+		if (apiKey == null || apiKey.isBlank()) {
+			throw AiException.unavailable("AI lesson generation is not configured: the AI_API_KEY environment variable is not set.");
+		}
+
+		StringBuilder accumulated = new StringBuilder();
+		chatClient.streamChatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(profile), delta -> {
+			accumulated.append(delta);
+			onDelta.accept(delta);
+		});
+
+		return parseLesson(profile, accumulated.toString());
+	}
+
+	/** Builds the exact chat messages used for lesson generation. */
+	public List<ChatMessage> prepareMessages(StudentProfileRequest profile) {
+		String outputLanguage = languageName(profile.getLanguage());
+		boolean hasMaterial = profile.getUploadedMaterial() != null && !profile.getUploadedMaterial().isBlank();
+		return List.of(
+				ChatMessage.system(buildSystemPrompt(outputLanguage, hasMaterial)),
+				ChatMessage.user(buildUserPrompt(profile)));
 	}
 
 	/** System prompt: teacher persona, teaching rules, language + strict JSON schema. */

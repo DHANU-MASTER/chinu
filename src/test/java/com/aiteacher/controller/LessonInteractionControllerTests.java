@@ -19,10 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.aiteacher.ai.AiException;
 import com.aiteacher.dto.AdaptiveTeachingResponse;
+import com.aiteacher.dto.AskTeacherResponse;
 import com.aiteacher.dto.EvaluationResponse;
 import com.aiteacher.dto.MisconceptionResponse;
 import com.aiteacher.dto.QuestionResponse;
 import com.aiteacher.service.AdaptiveTeachingService;
+import com.aiteacher.service.AskTeacherService;
 import com.aiteacher.service.AnswerEvaluationService;
 import com.aiteacher.service.MisconceptionDetectionService;
 import com.aiteacher.service.QuestionGenerationService;
@@ -49,6 +51,9 @@ class LessonInteractionControllerTests {
 
     @MockitoBean
     private AdaptiveTeachingService adaptiveService;
+
+    @MockitoBean
+    private AskTeacherService askTeacherService;
 
     // ---- Question generation tests ----
 
@@ -391,5 +396,73 @@ class LessonInteractionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.understanding").value("PARTIAL"))
                 .andExpect(jsonPath("$.recommendedApproach").value("SIMPLER"));
+    }
+
+    // ---- Ask-the-teacher tests ----
+
+    private static final String VALID_ASK_BODY = """
+            {
+              "question": "Why does chlorophyll look green?",
+              "topic": "Photosynthesis",
+              "sectionTitle": "What is Photosynthesis",
+              "sectionContent": "Photosynthesis is the process by which plants convert sunlight into energy.",
+              "persona": "chopper",
+              "language": "English"
+            }
+            """;
+
+    @Test
+    void returnsTeacherAnswerForValidAsk() throws Exception {
+        AskTeacherResponse response = AskTeacherResponse.builder()
+                .answer("Chlorophyll reflects green light while absorbing red and blue!")
+                .build();
+        when(askTeacherService.answerQuestion(any())).thenReturn(response);
+
+        mockMvc.perform(post("/api/lesson/ask")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_ASK_BODY))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.answer").value("Chlorophyll reflects green light while absorbing red and blue!"));
+    }
+
+    @Test
+    void blankQuestionReturns400ForAsk() throws Exception {
+        mockMvc.perform(post("/api/lesson/ask")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"question\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("question must not be empty"));
+    }
+
+    @Test
+    void overlyLongQuestionReturns400ForAsk() throws Exception {
+        String longQuestion = "x".repeat(501);
+        mockMvc.perform(post("/api/lesson/ask")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"question\":\"" + longQuestion + "\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void unconfiguredAiReturns503ForAsk() throws Exception {
+        when(askTeacherService.answerQuestion(any()))
+                .thenThrow(AiException.unavailable("AI_API_KEY is not set"));
+
+        mockMvc.perform(post("/api/lesson/ask")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_ASK_BODY))
+                .andExpect(status().isServiceUnavailable());
+    }
+
+    @Test
+    void upstreamAiFailureReturns502ForAsk() throws Exception {
+        when(askTeacherService.answerQuestion(any()))
+                .thenThrow(AiException.upstream("HTTP 429"));
+
+        mockMvc.perform(post("/api/lesson/ask")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_ASK_BODY))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.error").value("The teacher could not answer right now. Please try again."));
     }
 }

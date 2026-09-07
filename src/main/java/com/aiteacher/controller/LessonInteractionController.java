@@ -1,17 +1,22 @@
 package com.aiteacher.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.aiteacher.ai.AiException;
+import com.aiteacher.dto.AskTeacherRequest;
+import com.aiteacher.dto.AskTeacherResponse;
 import com.aiteacher.dto.AdaptiveTeachingRequest;
 import com.aiteacher.dto.AdaptiveTeachingResponse;
 import com.aiteacher.dto.EvaluationRequest;
@@ -21,6 +26,7 @@ import com.aiteacher.dto.MisconceptionResponse;
 import com.aiteacher.dto.QuestionRequest;
 import com.aiteacher.dto.QuestionResponse;
 import com.aiteacher.service.AdaptiveTeachingService;
+import com.aiteacher.service.AskTeacherService;
 import com.aiteacher.service.AnswerEvaluationService;
 import com.aiteacher.service.MisconceptionDetectionService;
 import com.aiteacher.service.QuestionGenerationService;
@@ -44,19 +50,51 @@ public class LessonInteractionController {
     private static final String MISCONCEPTION_FAILURE_MESSAGE = "Unable to analyze your answer right now. Please try again.";
     private static final String ADAPT_FAILURE_MESSAGE = "Unable to generate adaptive explanation. Please try again.";
 
+    private static final String ASK_FAILURE_MESSAGE = "The teacher could not answer right now. Please try again.";
+
     private final QuestionGenerationService questionService;
     private final AnswerEvaluationService evaluationService;
     private final MisconceptionDetectionService misconceptionService;
     private final AdaptiveTeachingService adaptiveService;
+    private final AskTeacherService askTeacherService;
 
     public LessonInteractionController(QuestionGenerationService questionService,
             AnswerEvaluationService evaluationService,
             MisconceptionDetectionService misconceptionService,
-            AdaptiveTeachingService adaptiveService) {
+            AdaptiveTeachingService adaptiveService,
+            AskTeacherService askTeacherService) {
         this.questionService = questionService;
         this.evaluationService = evaluationService;
         this.misconceptionService = misconceptionService;
         this.adaptiveService = adaptiveService;
+        this.askTeacherService = askTeacherService;
+    }
+
+    /**
+     * POST /api/lesson/ask — the student asks a free-form follow-up question
+     * mid-lesson; the current persona answers grounded in the section content.
+     */
+    @PostMapping("/ask")
+    public ResponseEntity<?> askTeacher(@RequestBody AskTeacherRequest request) {
+        try {
+            if (isBlank(request.getQuestion())) {
+                return badRequest("question must not be empty");
+            }
+            if (request.getQuestion().length() > 500) {
+                return badRequest("question must be 500 characters or fewer");
+            }
+            AskTeacherResponse response = askTeacherService.answerQuestion(request);
+            return ResponseEntity.ok(response);
+        } catch (AiException ex) {
+            log.warn("Ask-teacher failed ({}): {}", ex.getKind(), ex.getMessage());
+            String message = ex.isUnavailable() ? UNAVAILABLE_MESSAGE : ASK_FAILURE_MESSAGE;
+            HttpStatus status = ex.isUnavailable() ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
+            return ResponseEntity.status(status).body(Map.of("error", message));
+        } catch (Exception ex) {
+            log.error("Unexpected error during ask-teacher", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", ASK_FAILURE_MESSAGE));
+        }
     }
 
     /**
@@ -93,6 +131,81 @@ public class LessonInteractionController {
             log.error("Unexpected error during question generation", ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", QUESTION_FAILURE_MESSAGE));
+        }
+    }
+
+    /**
+     * POST /api/lesson/question/stream — SSE variant of question generation.
+     * Emits: {@code start}, {@code delta} (per token), {@code question} (the
+     * validated QuestionResponse), or {@code error}. Consumed with fetch() +
+     * ReadableStream so the check question types itself in live.
+     */
+    @PostMapping(value = "/question/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamQuestion(@RequestBody QuestionRequest request) {
+        SseEmitter emitter = new SseEmitter(180_000L);
+
+        Thread worker = new Thread(() -> {
+            try {
+                validateQuestionRequest(request);
+                sendEvent(emitter, "start", Map.of("status", "generating"));
+
+                QuestionResponse question = questionService.generateQuestionStreaming(request, delta -> {
+                    try {
+                        sendEvent(emitter, "delta", Map.of("text", delta));
+                    } catch (Exception ex) {
+                        log.debug("Client disconnected during question stream", ex);
+                    }
+                });
+
+                sendEvent(emitter, "question", question);
+                emitter.complete();
+            } catch (IllegalArgumentException ex) {
+                completeEmitterWithError(emitter, ex.getMessage());
+            } catch (AiException ex) {
+                log.warn("Question streaming failed ({}): {}", ex.getKind(), ex.getMessage());
+                completeEmitterWithError(emitter,
+                        ex.isUnavailable() ? UNAVAILABLE_MESSAGE : QUESTION_FAILURE_MESSAGE);
+            } catch (Exception ex) {
+                log.error("Unexpected error during question streaming", ex);
+                completeEmitterWithError(emitter, QUESTION_FAILURE_MESSAGE);
+            }
+        }, "question-stream");
+        worker.setDaemon(true);
+        worker.start();
+
+        return emitter;
+    }
+
+    private void validateQuestionRequest(QuestionRequest request) {
+        if (isBlank(request.getTopic())) {
+            throw new IllegalArgumentException("topic must not be empty");
+        }
+        if (isBlank(request.getSectionTitle())) {
+            throw new IllegalArgumentException("sectionTitle must not be empty");
+        }
+        if (isBlank(request.getSectionContent())) {
+            throw new IllegalArgumentException("sectionContent must not be empty");
+        }
+        if (isBlank(request.getLanguage())) {
+            throw new IllegalArgumentException("language must not be empty");
+        }
+        if (isBlank(request.getEducationLevel())) {
+            throw new IllegalArgumentException("educationLevel must not be empty");
+        }
+    }
+
+    private void sendEvent(SseEmitter emitter, String event, Object data) throws IOException {
+        synchronized (emitter) {
+            emitter.send(SseEmitter.event().name(event).data(data));
+        }
+    }
+
+    private void completeEmitterWithError(SseEmitter emitter, String message) {
+        try {
+            sendEvent(emitter, "error", Map.of("error", message));
+            emitter.complete();
+        } catch (Exception ex) {
+            emitter.completeWithError(ex);
         }
     }
 

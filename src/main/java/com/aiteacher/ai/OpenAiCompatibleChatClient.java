@@ -1,6 +1,11 @@
 package com.aiteacher.ai;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -87,6 +92,73 @@ public class OpenAiCompatibleChatClient implements AiChatClient {
 		}
 
 		return extractAssistantContent(responseBody);
+	}
+
+	@Override
+	public void streamChatCompletion(String baseUrl, String apiKey, String model,
+			List<ChatMessage> messages, TokenListener listener) {
+		String endpoint = (baseUrl == null || baseUrl.isBlank()) ? "https://api.openai.com/v1" : baseUrl;
+		if (endpoint.endsWith("/")) {
+			endpoint = endpoint.substring(0, endpoint.length() - 1);
+		}
+
+		Map<String, Object> payload = Map.of(
+				"model", model,
+				"temperature", 0.4,
+				"stream", true,
+				"messages", messages.stream()
+						.map(message -> Map.of("role", message.role(), "content", message.content()))
+						.toList());
+
+		HttpURLConnection connection = null;
+		try {
+			connection = (HttpURLConnection) URI.create(endpoint + "/chat/completions").toURL().openConnection();
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept", "text/event-stream");
+			connection.setConnectTimeout(connectTimeoutMs);
+			connection.setReadTimeout(readTimeoutMs);
+			connection.setDoOutput(true);
+			connection.getOutputStream().write(json.writeValueAsBytes(payload));
+
+			int status = connection.getResponseCode();
+			if (status < 200 || status >= 300) {
+				throw AiException.upstream("AI provider returned HTTP " + status + " during streaming");
+			}
+
+			try (BufferedReader reader = new BufferedReader(
+					new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					if (!line.startsWith("data:")) {
+						continue;
+					}
+					String data = line.substring(5).trim();
+					if (data.isEmpty()) {
+						continue;
+					}
+					if ("[DONE]".equals(data)) {
+						break;
+					}
+					String delta = json.readTree(data)
+							.path("choices").path(0).path("delta").path("content").asText("");
+					if (!delta.isEmpty()) {
+						listener.onDelta(delta);
+					}
+				}
+			}
+		} catch (AiException ex) {
+			throw ex;
+		} catch (IOException ex) {
+			throw AiException.upstream("AI streaming call failed: " + ex.getMessage(), ex);
+		} catch (Exception ex) {
+			throw AiException.upstream("AI streaming request failed: " + ex.getMessage(), ex);
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
+		}
 	}
 
 	/** Pulls {@code choices[0].message.content} out of the provider response. */
