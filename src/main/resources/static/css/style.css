@@ -1939,6 +1939,62 @@ body[data-persona="lucky_roux"] .flow-step.active .flow-dot { background: var(--
   font-size: 0.95rem;
 }
 
+/* ---- Ask-the-teacher chat thread ---- */
+.ask-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-bottom: 10px;
+}
+
+.ask-thread:empty { display: none; }
+
+.ask-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 88%;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  animation: flow-card-in 0.3s ease backwards;
+}
+
+.ask-msg-text {
+  padding: 8px 12px;
+  border-radius: 14px;
+}
+
+.ask-msg-user {
+  align-self: flex-end;
+}
+
+.ask-msg-user .ask-msg-text {
+  background: var(--grad-brand);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.ask-msg-teacher .ask-msg-text {
+  background: rgba(124, 108, 255, 0.1);
+  border: 1px solid rgba(124, 108, 255, 0.3);
+  color: var(--ink-1);
+  border-bottom-left-radius: 4px;
+}
+
+.ask-msg-error .ask-msg-text {
+  background: rgba(255, 107, 122, 0.12);
+  border: 1px solid rgba(255, 107, 122, 0.4);
+  color: var(--bad);
+}
+
+.ask-transport {
+  font-size: 0.72rem;
+  margin-top: 6px;
+}
+
 /* ==========================================================================
    13. Live lesson streaming panel (SSE)
    ========================================================================== */

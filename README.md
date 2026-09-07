@@ -3,7 +3,7 @@
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/your-username/ai-teacher/actions/workflows/ci.yml)
 [![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
-[![Tests](https://img.shields.io/badge/Tests-196_passing-success)](#-testing)
+[![Tests](https://img.shields.io/badge/Tests-210_passing-success)](#-testing)
 [![E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)](#-testing)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)](#-platform-capabilities-latest)
 [![License](https://img.shields.io/badge/License-MIT-9cf)](LICENSE)
@@ -156,7 +156,7 @@ Open browser at: **[http://localhost:8080](http://localhost:8080)**
 - **🎬 Guest Demo Mode** — `Try a Demo Lesson` on the login screen (or `index.html?demo=1`) explores the full app without an account.
 - **🎨 Landing Page** — `landing.html` introduces the product and deep-links into demo mode.
 - **🎤 Voice Answers** — speak answers to check questions (Web Speech Recognition, English/Hindi/Kannada) via the mic button on any answer box.
-- **💬 Ask the Teacher** — free-form mid-lesson Q&A: `POST /api/lesson/ask` answers in the current persona's voice, grounded in the section being taught.
+- **💬 Ask the Teacher (live chat)** — bidirectional WebSocket chat at `/ws/ask`: streaming deltas, per-lesson conversation history with reconnect replay and AI context, chat-clear, plus automatic HTTP fallback (`/api/lesson/ask`) when sockets are blocked.
 - **🲸 SSE Streaming** — lessons *and* check questions generate token-by-token (`/api/lesson/plan/stream`, `/api/lesson/question/stream`): the AI writes live on screen while the response is still in flight.
 - **🌐 UI i18n** — the app chrome translates to Hindi/Kannada via `js/i18n.js` (follows the Preferred Language selector).
 - **📱 Installable PWA** — `manifest.webmanifest` + `sw.js` (offline app shell; API calls are always live).
@@ -167,7 +167,7 @@ Open browser at: **[http://localhost:8080](http://localhost:8080)**
 
 ## 🧪 Testing
 
-Run the full automated test suite (196 unit & integration tests):
+Run the full automated test suite (210 unit & integration tests):
 
 ```bash
 cmd /c mvnw.cmd test

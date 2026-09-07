@@ -55,13 +55,32 @@ public class AIAskTeacherService implements AskTeacherService {
             throw AiException.unavailable("AI ask-the-teacher is not configured: the AI_API_KEY environment variable is not set.");
         }
 
+        String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(request));
+        return parseAnswer(rawContent);
+    }
+
+    @Override
+    public AskTeacherResponse generateAnswerStreaming(AskTeacherRequest request,
+            java.util.function.Consumer<String> onDelta) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw AiException.unavailable("AI ask-the-teacher is not configured: the AI_API_KEY environment variable is not set.");
+        }
+
+        StringBuilder accumulated = new StringBuilder();
+        chatClient.streamChatCompletion(baseUrl, apiKey.trim(), model, prepareMessages(request), delta -> {
+            accumulated.append(delta);
+            onDelta.accept(delta);
+        });
+
+        return parseAnswer(accumulated.toString());
+    }
+
+    /** Builds the exact chat messages used for ask-the-teacher. */
+    public List<ChatMessage> prepareMessages(AskTeacherRequest request) {
         String outputLanguage = languageName(request.getLanguage());
-        List<ChatMessage> messages = List.of(
+        return List.of(
                 ChatMessage.system(buildSystemPrompt(outputLanguage, request.getPersona())),
                 ChatMessage.user(buildUserPrompt(request)));
-
-        String rawContent = chatClient.chatCompletion(baseUrl, apiKey.trim(), model, messages);
-        return parseAnswer(rawContent);
     }
 
     private String buildSystemPrompt(String outputLanguage, String persona) {
@@ -77,13 +96,22 @@ public class AIAskTeacherService implements AskTeacherService {
     }
 
     private String buildUserPrompt(AskTeacherRequest request) {
+        StringBuilder conversation = new StringBuilder();
+        List<String> previousTurns = request.getPreviousTurns();
+        if (previousTurns != null && !previousTurns.isEmpty()) {
+            conversation.append("Recent conversation (for continuity):\n");
+            previousTurns.forEach(turn -> conversation.append("- ").append(turn).append('\n'));
+            conversation.append('\n');
+        }
+
         return """
-                Lesson topic: %s
+                %sLesson topic: %s
                 Current section: %s
                 Section content: %s
 
                 Student's question: %s
                 """.formatted(
+                conversation,
                 orDefault(request.getTopic(), "General"),
                 orDefault(request.getSectionTitle(), "Current section"),
                 truncate(orDefault(request.getSectionContent(), ""), 2500),

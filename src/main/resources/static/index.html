@@ -619,17 +619,15 @@
           <div id="ts-text"></div>
           <div id="ts-section-example" class="teach-example hidden"></div>
 
-          <!-- Ask the teacher: free-form mid-lesson Q&A -->
+          <!-- Ask the teacher: live chat with the current persona -->
           <div id="ts-ask-area" class="ask-area">
+            <div id="ts-ask-thread" class="ask-thread" aria-live="polite"></div>
             <div class="ask-row">
               <input id="ts-ask-input" class="input" type="text" maxlength="500"
                      placeholder="Ask your teacher anything about this section…" />
               <button id="ts-ask-send" class="btn btn-primary btn-sm" type="button" data-i18n="askBtn">Ask</button>
             </div>
-            <div id="ts-ask-response" class="ask-response hidden">
-              <span class="ask-avatar" aria-hidden="true">🧑‍🏫</span>
-              <span id="ts-ask-response-text"></span>
-            </div>
+            <p id="ts-ask-transport" class="ask-transport muted"></p>
           </div>
         </div>
 

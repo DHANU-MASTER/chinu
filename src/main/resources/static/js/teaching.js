@@ -88,7 +88,7 @@ window.AiTeacherTeaching = (function () {
       'ts-question-area', 'ts-question-loading', 'ts-question-content',
       'ts-question-text', 'ts-mcq-options', 'ts-short-answer', 'ts-answer-input',
       'ts-question-error', 'ts-submit-answer',
-      'ts-ask-input', 'ts-ask-send', 'ts-ask-response', 'ts-ask-response-text',
+      'ts-ask-input', 'ts-ask-send', 'ts-ask-thread', 'ts-ask-transport',
       'ts-evaluation-loading', 'ts-feedback', 'ts-feedback-banner',
       'ts-feedback-text', 'ts-feedback-concept', 'ts-continue-lesson',
       'ts-adaptive-area', 'ts-adaptive-loading', 'ts-adaptive-content',
@@ -307,32 +307,116 @@ window.AiTeacherTeaching = (function () {
     }, 260);
   }
 
-  /* -------- Ask the teacher: grounded mid-lesson Q&A in persona -------- */
+  /* -------- Ask the teacher: bidirectional WebSocket chat -------- */
+  var askSocket = null;
+  var askChatId = null;
+  var askStreamingTextEl = null;
+
+  function connectAskSocket() {
+    if (!window.WebSocket) return;
+    try {
+      var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      askSocket = new WebSocket(proto + '//' + location.host + '/ws/ask?chatId=' + encodeURIComponent(askChatId));
+    } catch (e) {
+      askSocket = null;
+      updateAskTransport();
+      return;
+    }
+
+    askSocket.onopen = updateAskTransport;
+    askSocket.onclose = function () { askSocket = null; updateAskTransport(); };
+    askSocket.onerror = function () { try { askSocket.close(); } catch (e) { /* ignore */ } };
+    askSocket.onmessage = function (event) {
+      var frame;
+      try { frame = JSON.parse(event.data); } catch (e) { return; }
+
+      if (frame.type === 'history' && Array.isArray(frame.messages)) {
+        frame.messages.forEach(function (turn) {
+          addAskBubble(turn.role === 'user' ? 'user' : 'teacher', turn.text);
+        });
+      } else if (frame.type === 'delta' && frame.text) {
+        if (!askStreamingTextEl) {
+          askStreamingTextEl = addAskBubble('teacher', '');
+        }
+        askStreamingTextEl.textContent += frame.text;
+      } else if (frame.type === 'answer') {
+        if (askStreamingTextEl) {
+          askStreamingTextEl.textContent = frame.answer;
+        } else {
+          addAskBubble('teacher', frame.answer);
+        }
+        askStreamingTextEl = null;
+        avatarState('teaching');
+        speakText(frame.answer, lesson ? (lesson.language || 'English') : 'English');
+      } else if (frame.type === 'cleared') {
+        els['ts-ask-thread'].innerHTML = '';
+      } else if (frame.type === 'error') {
+        askStreamingTextEl = null;
+        addAskBubble('error', frame.error || 'The teacher could not answer right now.');
+        avatarState('idle');
+      }
+    };
+  }
+
+  function updateAskTransport() {
+    if (!els['ts-ask-transport']) return;
+    els['ts-ask-transport'].textContent = askSocket && askSocket.readyState === 1
+      ? '🟢 Live chat connected'
+      : '⚪ Live chat unavailable — answers use the standard request path';
+  }
+
+  function addAskBubble(role, text) {
+    var thread = els['ts-ask-thread'];
+    var bubble = document.createElement('div');
+    bubble.className = 'ask-msg ask-msg-' + role;
+
+    if (role === 'teacher') {
+      var avatar = document.createElement('span');
+      avatar.className = 'ask-avatar';
+      avatar.textContent = '🧑‍🏫';
+      bubble.appendChild(avatar);
+    }
+
+    var textEl = document.createElement('span');
+    textEl.className = 'ask-msg-text';
+    textEl.textContent = text;
+    bubble.appendChild(textEl);
+
+    thread.appendChild(bubble);
+    thread.scrollTop = thread.scrollHeight;
+    return textEl;
+  }
+
   function askTeacher() {
     var input = els['ts-ask-input'];
     var question = (input.value || '').trim();
     if (!question || !lesson) return;
 
-    var responseEl = els['ts-ask-response'];
-    var textEl = els['ts-ask-response-text'];
     var section = lesson.sections[step - 1] || {};
-
     input.value = '';
-    textEl.textContent = '…';
-    responseEl.classList.remove('hidden');
+    addAskBubble('user', question);
     avatarState('thinking');
 
+    var context = {
+      question: question,
+      topic: lesson.topic || lesson.lessonTitle || '',
+      sectionTitle: section.title || '',
+      sectionContent: section.explanation || section.description || '',
+      persona: profile ? profile.persona : 'chopper',
+      language: lesson.language || 'English'
+    };
+
+    if (askSocket && askSocket.readyState === 1) {
+      askStreamingTextEl = null;
+      askSocket.send(JSON.stringify(Object.assign({ type: 'ask' }, context)));
+      return;
+    }
+
+    // HTTP fallback when the socket is unavailable (e.g. proxy blocks WS).
     fetch('/api/lesson/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question: question,
-        topic: lesson.topic || lesson.lessonTitle || '',
-        sectionTitle: section.title || '',
-        sectionContent: section.explanation || section.description || '',
-        persona: profile ? profile.persona : 'chopper',
-        language: lesson.language || 'English'
-      })
+      body: JSON.stringify(context)
     })
       .then(function (res) {
         return res.json().then(function (body) { return { ok: res.ok, body: body }; });
@@ -341,12 +425,12 @@ window.AiTeacherTeaching = (function () {
         if (!result.ok) {
           throw new Error((result.body && result.body.error) || 'The teacher could not answer right now.');
         }
-        textEl.textContent = result.body.answer;
+        addAskBubble('teacher', result.body.answer);
         avatarState('teaching');
         speakText(result.body.answer, lesson.language || 'English');
       })
       .catch(function (err) {
-        textEl.textContent = err.message || 'The teacher could not answer right now.';
+        addAskBubble('error', err.message || 'The teacher could not answer right now.');
         avatarState('idle');
       });
   }
@@ -1674,7 +1758,10 @@ window.AiTeacherTeaching = (function () {
       advanceToNextStep();
     };
 
-    // Ask-the-teacher: free-form mid-lesson Q&A
+    // Ask-the-teacher: live WebSocket chat with the current persona
+    askChatId = 'lesson-' + Date.now();
+    els['ts-ask-thread'].innerHTML = '';
+    connectAskSocket();
     els['ts-ask-send'].onclick = askTeacher;
     els['ts-ask-input'].addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
