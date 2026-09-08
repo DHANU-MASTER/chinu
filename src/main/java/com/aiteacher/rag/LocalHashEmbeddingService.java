@@ -4,6 +4,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Deterministic, offline embedding: no external API, no model download, works
  * for any language including Hindi and Kannada. Text is tokenized into word
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
  * <p>This is a hackathon-grade lexical/semantic-hybrid embedding — it captures
  * topical overlap well enough for retrieval but is not a learned model.</p>
  */
+@Component
 public class LocalHashEmbeddingService implements EmbeddingService {
 
     static final int DIMENSIONS = 256;

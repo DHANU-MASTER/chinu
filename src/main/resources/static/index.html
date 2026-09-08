@@ -72,8 +72,10 @@
         </div>
       </div>
 
-      <div class="modal-footer-actions">
-        <button id="btnPrintCertificate" class="btn btn-primary btn-block" type="button">🖨️ Print / Save Certificate PDF</button>
+      <div class="modal-footer-actions cert-actions-row">
+        <button id="btnPrintCertificate" class="btn btn-primary" type="button">🖨️ Print / PDF</button>
+        <button id="btnDownloadCertificate" class="btn btn-secondary" type="button">⬇️ PNG</button>
+        <button id="btnShareCertificate" class="btn btn-ghost" type="button">📤 Share</button>
       </div>
     </div>
   </div>
@@ -381,6 +383,7 @@
                   <p class="persona-role">Kind Doctor</p>
                   <p class="persona-desc">Step-by-step, analytical &amp; caring doctor explanations.</p>
                   <span class="persona-badge">Blue Sakura Aura</span>
+                  <button type="button" class="persona-voice-preview" data-persona="chopper" aria-label="Preview Chopper's voice">🔊 Hear voice</button>
                 </div>
 
                 <!-- Red-Haired Shanks -->
@@ -391,6 +394,7 @@
                   <p class="persona-role">Inspiring Captain</p>
                   <p class="persona-desc">High-energy, bold &amp; motivating real-world examples.</p>
                   <span class="persona-badge">Red Haki Aura</span>
+                  <button type="button" class="persona-voice-preview" data-persona="shanks" aria-label="Preview Shanks' voice">🔊 Hear voice</button>
                 </div>
 
                 <!-- Lucky Roux -->
@@ -401,6 +405,7 @@
                   <p class="persona-role">Quick Specialist</p>
                   <p class="persona-desc">Fast, fun, approachable &amp; algorithmic breakdowns.</p>
                   <span class="persona-badge">Green Energy Aura</span>
+                  <button type="button" class="persona-voice-preview" data-persona="lucky_roux" aria-label="Preview Lucky Roux's voice">🔊 Hear voice</button>
                 </div>
               </div>
 
@@ -986,6 +991,7 @@
     </main>
   </div>
 
+  <script src="js/identity.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/voice-input.js"></script>
   <script src="js/i18n.js"></script>
@@ -1200,6 +1206,133 @@
         window.print();
       });
 
+      /* === Certificate PNG export & share (zero-dependency canvas render) === */
+      function drawCertificateCanvas() {
+        var scale = 2; // crisp on retina, still a reasonable file size
+        var W = 1200, H = 850;
+        var canvas = document.createElement('canvas');
+        canvas.width = W * scale;
+        canvas.height = H * scale;
+        var ctx = canvas.getContext('2d');
+        ctx.scale(scale, scale);
+
+        var grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, '#f8f6f1');
+        grad.addColorStop(1, '#efe9dd');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Double border like the on-screen certificate
+        ctx.strokeStyle = '#1a2238';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(28, 28, W - 56, H - 56);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(44, 44, W - 88, H - 88);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#1a2238';
+
+        // Header
+        ctx.font = '64px serif';
+        ctx.fillText('🧑‍🏫', W / 2, 150);
+        ctx.font = '800 40px Georgia, serif';
+        ctx.fillText('AI TEACHER PLATFORM', W / 2, 215);
+        ctx.font = 'italic 20px Georgia, serif';
+        ctx.fillStyle = '#5a6178';
+        ctx.fillText('Autonomous Multimodal Pedagogical Engine', W / 2, 248);
+
+        // Body
+        ctx.fillStyle = '#1a2238';
+        ctx.font = '22px Georgia, serif';
+        ctx.fillText('This is to certify that', W / 2, 330);
+        ctx.font = '700 64px Georgia, serif';
+        ctx.fillText(document.getElementById('certStudentName').textContent || 'Student', W / 2, 410);
+        ctx.font = '20px Georgia, serif';
+        ctx.fillStyle = '#3c4560';
+        ctx.fillText('has successfully completed the personalized AI-guided lesson and assessment on', W / 2, 462);
+        ctx.font = '700 40px Georgia, serif';
+        ctx.fillStyle = '#7c5cff';
+        ctx.fillText(document.getElementById('certTopic').textContent || 'Personalized AI Lesson', W / 2, 520);
+
+        // Metrics row
+        var metrics = [
+          { label: 'Mastery Score', value: document.getElementById('certScore').textContent },
+          { label: 'Mastery Rank', value: document.getElementById('certRank').textContent },
+          { label: 'Date Issued', value: document.getElementById('certDate').textContent }
+        ];
+        var colW = (W - 200) / 3;
+        metrics.forEach(function (metric, i) {
+          var cx = 100 + colW * i + colW / 2;
+          ctx.fillStyle = '#5a6178';
+          ctx.font = '700 16px Georgia, serif';
+          ctx.fillText(metric.label.toUpperCase(), cx, 610);
+          ctx.fillStyle = '#1a2238';
+          ctx.font = '700 30px Georgia, serif';
+          ctx.fillText(metric.value || '-', cx, 648);
+          ctx.strokeStyle = 'rgba(26, 34, 56, 0.25)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(100 + colW * i + 20, 668);
+          ctx.lineTo(100 + colW * (i + 1) - 20, 668);
+          ctx.stroke();
+        });
+
+        // Footer: seal + signature
+        ctx.font = '54px serif';
+        ctx.fillText('🏆', 240, 762);
+        ctx.font = '700 14px Georgia, serif';
+        ctx.fillStyle = '#5a6178';
+        ctx.fillText('OFFICIAL SEAL', 240, 792);
+        ctx.fillStyle = '#1a2238';
+        ctx.font = 'italic 700 34px Georgia, serif';
+        ctx.fillText(document.getElementById('certPersonaSignature').textContent || 'AI Teacher', W - 240, 762);
+        ctx.font = '600 15px Georgia, serif';
+        ctx.fillStyle = '#5a6178';
+        ctx.fillText('AI TEACHER & PEDAGOGICAL MASTER', W - 240, 792);
+
+        return canvas;
+      }
+
+      document.getElementById('btnDownloadCertificate').addEventListener('click', function () {
+        var canvas = drawCertificateCanvas();
+        canvas.toBlob(function (blob) {
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement('a');
+          link.href = url;
+          link.download = 'ai-teacher-certificate-' + (document.getElementById('certStudentName').textContent || 'student')
+              .replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.png';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 2_000);
+          showToast('Certificate downloaded as PNG! 🎉', 'success');
+        }, 'image/png');
+      });
+
+      document.getElementById('btnShareCertificate').addEventListener('click', function () {
+        var canvas = drawCertificateCanvas();
+        canvas.toBlob(function (blob) {
+          if (!blob) { showToast('Sharing is not supported in this browser.', 'error'); return; }
+          var studentName = document.getElementById('certStudentName').textContent || 'A student';
+          var topic = document.getElementById('certTopic').textContent || 'a lesson';
+          var shareData = {
+            title: 'AI Teacher Certificate',
+            text: studentName + ' just mastered ' + topic + ' with a personal AI teacher! 🎓',
+          };
+          if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'certificate.png', { type: 'image/png' })] })) {
+            shareData.files = [new File([blob], 'certificate.png', { type: 'image/png' })];
+          }
+          if (navigator.share) {
+            navigator.share(shareData).catch(function () { /* user cancelled */ });
+          } else {
+            // Clipboard fallback so the button always does something useful
+            (navigator.clipboard ? navigator.clipboard.writeText(shareData.text) : Promise.reject())
+              .then(function () { showToast('Share text copied to clipboard! 📋', 'success'); })
+              .catch(function () { showToast('Sharing is not supported in this browser.', 'error'); });
+          }
+        }, 'image/png');
+      });
+
       /* Timetable Logic with Slot Deletion */
       function renderTimetable() {
         if (!timetableGridContainer) return;
@@ -1398,6 +1531,23 @@
           document.getElementById('personaCatchphraseDisplay').textContent = '"' + quote + '"';
           showToast('Selected AI Teacher Persona: ' + card.getAttribute('data-name'), 'info');
           playChime('shift');
+        });
+      });
+
+      /* Persona voice preview: hear a sample line before committing */
+      var PERSONA_PREVIEW_LINES = {
+        chopper: "I will cure your misunderstandings with science! Let us begin, step by step.",
+        shanks: "Prepare yourself for an inspiring lesson — the seas of knowledge await!",
+        lucky_roux: "Let us gobble up this concept in no time. Ready? Let us go!"
+      };
+      document.querySelectorAll('.persona-voice-preview').forEach(function (btn) {
+        btn.addEventListener('click', function (event) {
+          event.stopPropagation(); // don't re-trigger the card's selection handler
+          var persona = btn.getAttribute('data-persona');
+          if (window.AiTeacherSpeech && PERSONA_PREVIEW_LINES[persona]) {
+            window.AiTeacherSpeech.speak(PERSONA_PREVIEW_LINES[persona], 'English', { rate: 1.0 });
+            showToast('Voice preview — meet your teacher! 🔊', 'info');
+          }
         });
       });
 

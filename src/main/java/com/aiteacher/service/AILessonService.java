@@ -61,6 +61,9 @@ public class AILessonService implements AIService {
 			Do not invent facts that contradict the supplied material.
 			If the material does not contain enough information to answer something,
 			clearly state that additional information is required.
+			When a fact or explanation comes directly from an excerpt of the material,
+			cite it inline as [Excerpt N] (N = the excerpt number shown above the text).
+			Use at most one citation per sentence, only where the source truly supports it.
 			""";
 
 	private final AiChatClient chatClient;

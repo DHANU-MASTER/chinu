@@ -1,6 +1,7 @@
 services:
   db:
-    image: postgres:16-alpine
+    # pgvector-enabled Postgres: powers RAG when RAG_EMBEDDINGS=api
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: aiteacher
       POSTGRES_USER: aiteacher
@@ -23,6 +24,16 @@ services:
       AI_API_KEY: ${AI_API_KEY:-}
       AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
       AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-text-embedding-3-small}
+      # Optional fallback provider: used automatically when the primary fails
+      AI_FALLBACK_BASE_URL: ${AI_FALLBACK_BASE_URL:-}
+      AI_FALLBACK_API_KEY: ${AI_FALLBACK_API_KEY:-}
+      AI_FALLBACK_MODEL: ${AI_FALLBACK_MODEL:-}
+      # Per-user AI rate limiting (sliding window)
+      AI_RATE_LIMIT: ${AI_RATE_LIMIT:-30}
+      AI_RATE_WINDOW_SECONDS: ${AI_RATE_WINDOW_SECONDS:-60}
+      # 'api' = real embedding model + pgvector; 'local' (default) = offline hash embeddings
+      RAG_EMBEDDINGS: ${RAG_EMBEDDINGS:-api}
     ports:
       - "8080:8080"
     depends_on:

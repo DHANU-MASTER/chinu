@@ -584,6 +584,15 @@ a:hover {
   position: relative;
 }
 
+/* Certificate modal action row: Print / PNG / Share side by side */
+.cert-actions-row {
+  display: flex;
+  gap: 10px;
+}
+.cert-actions-row .btn {
+  flex: 1;
+}
+
 .cert-logo { font-size: 3rem; }
 .cert-org { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: var(--warn); margin: 4px 0 0; }
 .cert-sub { font-size: 0.8rem; font-weight: 700; color: var(--brand-2); margin-bottom: 16px; }
@@ -954,6 +963,30 @@ a:hover {
 .aura-blue .persona-badge, .aura-blue.teach-avatar { border-color: var(--brand-2); box-shadow: 0 0 15px rgba(49, 208, 255, 0.4); }
 .aura-red .persona-badge, .aura-red.teach-avatar { border-color: var(--bad); box-shadow: 0 0 15px rgba(255, 107, 122, 0.4); }
 .aura-green .persona-badge, .aura-green.teach-avatar { border-color: var(--ok); box-shadow: 0 0 15px rgba(47, 230, 168, 0.4); }
+
+/* Persona voice preview button */
+.persona-voice-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.persona-voice-preview:hover {
+  background: rgba(124, 108, 255, 0.22);
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+.persona-voice-preview:active { transform: translateY(0); }
+.persona-voice-preview:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 .persona-quote-banner {
   font-size: var(--fs-small);

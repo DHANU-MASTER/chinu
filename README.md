@@ -3,11 +3,13 @@
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/your-username/ai-teacher/actions/workflows/ci.yml)
 [![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
-[![Tests](https://img.shields.io/badge/Tests-210_passing-success)](#-testing)
+[![Tests](https://img.shields.io/badge/Tests-236_passing-success)](#-testing)
 [![E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)](#-testing)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)](#-platform-capabilities-latest)
 [![License](https://img.shields.io/badge/License-MIT-9cf)](LICENSE)
-[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Enabled-blue)](#-5-document-extraction--rag-grounding)
+[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Embeddings_+_pgvector-8A2BE2)](#-5-document-extraction--rag-grounding)
+[![Resilience](https://img.shields.io/badge/AI_Fallback-Provider_Chain-FF8C00)](#-ai-resilience--fair-use)
+[![Rate Limited](https://img.shields.io/badge/AI_Rate_Limit-Per_User_Sliding_Window-red)](#-ai-resilience--fair-use)
 
 An enterprise-grade AI teaching platform designed to provide a human-like, adaptive pedagogical experience — driven by real user profile data, document extraction (PDF / TXT / PPT / PPTX), RAG grounding, and generative AI models.
 
@@ -26,6 +28,7 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 
 ### 📜 3. Printable Certificate of AI Mastery & PDF Reports
 - **📜 Formal Certificate of Completion:** Generated upon completing assessments with student name, avatar, topic, mastery score %, date, and official AI Teacher signature. Includes a 1-click **`🖨️ Print / Save Certificate PDF`** trigger!
+- **⬇️ PNG Export & 📤 Share:** The certificate renders to a high-resolution canvas (2x scale) — download as PNG or share natively via the Web Share API (with clipboard fallback), ready for WhatsApp/LinkedIn.
 
 ### 🔥 4. Daily Study Streak Tracker & Achievement Badges
 - **Streak Counter:** Topbar badge tracking daily learning momentum (`🔥 1-Day Streak`, `🔥 3-Day Streak`).
@@ -55,6 +58,7 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 ### 📄 9. Document Extraction & RAG Grounding
 - **File Text Extraction:** Extracts readable content from PDF (PDFBox), PPT/PPTX (Apache POI), and plain text files.
 - **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts.
+- **🎓 Real Embeddings + pgvector (production mode):** Set `RAG_EMBEDDINGS=api` (the Docker Compose default) to embed chunks with an OpenAI-compatible embedding model (`AI_EMBEDDING_MODEL`) and persist them in PostgreSQL + the pgvector extension, with cosine similarity search (`<=>`) inside the database and `[Excerpt N]` citations in the generated lessons. `RAG_EMBEDDINGS=local` keeps the zero-setup offline mode.
 - **🎯 98% RAG Confidence Badge:** Displays document grounding confidence when uploaded material is present.
 
 ### 🎬 10. Smart 3D Animated Visual Stage Generator for ANY Topic
@@ -156,6 +160,8 @@ Open browser at: **[http://localhost:8080](http://localhost:8080)**
 - **🎬 Guest Demo Mode** — `Try a Demo Lesson` on the login screen (or `index.html?demo=1`) explores the full app without an account.
 - **🎨 Landing Page** — `landing.html` introduces the product and deep-links into demo mode.
 - **🎤 Voice Answers** — speak answers to check questions (Web Speech Recognition, English/Hindi/Kannada) via the mic button on any answer box.
+- **🔊 Persona Voice Preview** — every persona card in the wizard has a `Hear voice` button that speaks a sample line before you commit.
+- **🛡️ AI Resilience & Fair Use** — a provider fallback chain (`AI_FALLBACK_BASE_URL`/`AI_FALLBACK_API_KEY`/`AI_FALLBACK_MODEL`) retries failed calls on a second provider (streaming never replays delivered deltas), and a per-user sliding-window rate limiter (`AI_RATE_LIMIT`, default 30 req/min keyed on `X-Student-Email`, IP fallback for demos) sheds abuse with `429` + `Retry-After` before it costs money.
 - **💬 Ask the Teacher (live chat)** — bidirectional WebSocket chat at `/ws/ask`: streaming deltas, per-lesson conversation history with reconnect replay and AI context, chat-clear, plus automatic HTTP fallback (`/api/lesson/ask`) when sockets are blocked.
 - **🲸 SSE Streaming** — lessons *and* check questions generate token-by-token (`/api/lesson/plan/stream`, `/api/lesson/question/stream`): the AI writes live on screen while the response is still in flight.
 - **🌐 UI i18n** — the app chrome translates to Hindi/Kannada via `js/i18n.js` (follows the Preferred Language selector).

@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Thread-safe in-memory {@link VectorStore}. Vectors are L2-normalized at
  * embedding time, so cosine similarity is a plain dot product. Ties are broken
  * by document order for deterministic results.
  */
+@Component
 public class InMemoryVectorStore implements VectorStore {
 
     private final Map<String, List<Entry>> documents = new ConcurrentHashMap<>();

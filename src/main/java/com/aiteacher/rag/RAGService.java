@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,6 +36,19 @@ public class RAGService implements RetrievalService {
 
     private final Map<String, List<DocumentChunk>> indexCache = new ConcurrentHashMap<>();
 
+    /** Production constructor: picks the configured embedding/store pair. */
+    public RAGService(RagConfiguration configuration,
+            ObjectProvider<ApiEmbeddingService> apiEmbeddings,
+            ObjectProvider<PgVectorStore> pgVectorStore,
+            LocalHashEmbeddingService localEmbeddings,
+            InMemoryVectorStore inMemoryStore,
+            ParagraphChunkingService chunking) {
+        this(chunking,
+                configuration.embeddingService(apiEmbeddings, localEmbeddings),
+                configuration.vectorStore(pgVectorStore, inMemoryStore));
+    }
+
+    /** Test/local convenience constructor: the zero-setup local pipeline. */
     public RAGService() {
         this(new ParagraphChunkingService(), new LocalHashEmbeddingService(), new InMemoryVectorStore());
     }

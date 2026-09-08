@@ -23,7 +23,9 @@ module.exports = defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
   ],
   webServer: {
-    command: './mvnw -q spring-boot:run',
+    command: process.platform === 'win32'
+      ? `cmd /c "${require('path').join(__dirname, 'mvnw.cmd')}" -q spring-boot:run`
+      : './mvnw -q spring-boot:run',
     url: 'http://127.0.0.1:8080/index.html',
     reuseExistingServer: true,
     timeout: 240_000
