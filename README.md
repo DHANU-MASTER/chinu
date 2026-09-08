@@ -1,15 +1,10 @@
 # 🎓 AI Teacher — Autonomous Multimodal Pedagogical SaaS Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/your-username/ai-teacher/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/DHANU-MASTER/chinu/actions)
 [![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
-[![Tests](https://img.shields.io/badge/Tests-236_passing-success)](#-testing)
-[![E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)](#-testing)
-[![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)](#-platform-capabilities-latest)
-[![License](https://img.shields.io/badge/License-MIT-9cf)](LICENSE)
-[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Embeddings_+_pgvector-8A2BE2)](#-5-document-extraction--rag-grounding)
-[![Resilience](https://img.shields.io/badge/AI_Fallback-Provider_Chain-FF8C00)](#-ai-resilience--fair-use)
-[![Rate Limited](https://img.shields.io/badge/AI_Rate_Limit-Per_User_Sliding_Window-red)](#-ai-resilience--fair-use)
+[![Tests](https://img.shields.io/badge/Tests-210_Passing-success)](#-testing)
+[![AI RAG Grounded](https://img.shields.io/badge/AI_RAG-Enabled-blue)](#-9-document-extraction--rag-grounding)
 
 An enterprise-grade AI teaching platform designed to provide a human-like, adaptive pedagogical experience — driven by real user profile data, document extraction (PDF / TXT / PPT / PPTX), RAG grounding, and generative AI models.
 
@@ -26,42 +21,43 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 ### 🎯 2. Lesson Milestone Progress Checklist Widget
 - **Live Section Progression Bar:** Section milestone checklist box on the Teaching Stage tracking lesson progression (`[x] Intro`, `[/] Section 1`, `[ ] Section 2`, `[ ] Final Assessment`).
 
-### 📜 3. Printable Certificate of AI Mastery & PDF Reports
-- **📜 Formal Certificate of Completion:** Generated upon completing assessments with student name, avatar, topic, mastery score %, date, and official AI Teacher signature. Includes a 1-click **`🖨️ Print / Save Certificate PDF`** trigger!
-- **⬇️ PNG Export & 📤 Share:** The certificate renders to a high-resolution canvas (2x scale) — download as PNG or share natively via the Web Share API (with clipboard fallback), ready for WhatsApp/LinkedIn.
+### 💬 3. Live "Ask Teacher" Real-Time WebSocket Streaming Chat
+- **Interactive AI Assistant:** Ask follow-up questions at any time during a lesson via real-time WebSocket streaming (`/ws/ask-teacher`).
 
-### 🔥 4. Daily Study Streak Tracker & Achievement Badges
+### 📜 4. Printable Certificate of AI Mastery & PDF Reports
+- **📜 Formal Certificate of Completion:** Generated upon completing assessments with student name, avatar, topic, mastery score %, date, and official AI Teacher signature. Includes a 1-click **`🖨️ Print / Save Certificate PDF`** trigger!
+
+### 🔥 5. Daily Study Streak Tracker & Achievement Badges
 - **Streak Counter:** Topbar badge tracking daily learning momentum (`🔥 1-Day Streak`, `🔥 3-Day Streak`).
 - **Unlocked Achievement Badges:** `First Steps 🏅`, `Quiz Ace 🎯`, and `Haki Awakened ⚡` badges on the Progress Dashboard.
 
-### 🔊 5. Web Audio API Sound Effects Manager (`🔊 / 🔇`)
+### 🔊 6. Web Audio API Sound Effects Manager (`🔊 / 🔇`)
 - Zero-dependency Web Audio API oscillator chime synthesizer playing audio cues on correct answers (`✨ Victory Chime`), persona selection (`🌸 Persona Shift`), and certificate unlocks.
 
-### 📅 6. AI Study Timetable & Schedule Planner
+### 📅 7. AI Study Timetable & Schedule Planner
 - **Interactive Weekly Schedule Grid (Mon – Sun):** Visual daily time blocks (*Morning*, *Afternoon*, *Evening*).
 - **🗑️ Slot Deletion:** 1-click delete icon button on every scheduled slot.
 - **🤖 1-Click "Generate AI Revision Schedule":** Evaluates weak areas from past reports and creates an optimized weekly revision schedule.
 - **🚀 1-Click "Start Session":** Launches the AI Teacher stage with pre-filled topic and study time.
 - **🏆 Dynamic Leaderboard Card:** Displays top student ranks (`Supreme Haki Master`, `Master`, `Adept`).
 
-### 🎭 7. 3 Anime 3D AI Teacher Personas
+### 🎭 8. 3 Anime 3D AI Teacher Personas
 - 🧪 **Chopper — The Kind & Clever Doctor:** Step-by-step, analytical & caring explanations (Blue Sakura Aura 🌸).
 - 🏴‍☠️ **Red-Haired Shanks — The Inspiring Captain:** High-energy, bold & motivating real-world examples (Red Conqueror's Haki Aura ⚡).
 - 🍗 **Lucky Roux — The Quick & Friendly Specialist:** Fast, fun, approachable & algorithmic breakdowns (Green Energy Aura ✨).
 
-### 🧙‍♂️ 8. 2-Step Personalized Learning Wizard & Quick-Demo Chips
+### 🧙‍♂️ 9. 2-Step Personalized Learning Wizard & Quick-Demo Chips
 - **Step 1 (Teacher & Profile):** Persona Choice (Chopper / Shanks / Lucky Roux), Educational Level, Preferred Language (English / Hindi / Kannada), Teaching Style.
 - **Step 2 (Learning Content & Goals):**
   - **⚡ 1-Click Quick-Demo Sample Chips:** Instant topic fills for `⚡ Newton's Laws`, `🧬 DNA Replication`, `💻 Python Recursion`, `📐 Pythagoras Theorem`.
   - Custom topic input OR document file upload.
 
-### 📄 9. Document Extraction & RAG Grounding
+### 📄 10. Document Extraction & RAG Grounding
 - **File Text Extraction:** Extracts readable content from PDF (PDFBox), PPT/PPTX (Apache POI), and plain text files.
 - **In-Memory RAG Grounding:** Paragraph chunking, local hash embedding, vector similarity store, and query retrieval to ground AI prompts.
-- **🎓 Real Embeddings + pgvector (production mode):** Set `RAG_EMBEDDINGS=api` (the Docker Compose default) to embed chunks with an OpenAI-compatible embedding model (`AI_EMBEDDING_MODEL`) and persist them in PostgreSQL + the pgvector extension, with cosine similarity search (`<=>`) inside the database and `[Excerpt N]` citations in the generated lessons. `RAG_EMBEDDINGS=local` keeps the zero-setup offline mode.
 - **🎯 98% RAG Confidence Badge:** Displays document grounding confidence when uploaded material is present.
 
-### 🎬 10. Smart 3D Animated Visual Stage Generator for ANY Topic
+### 🎬 11. Smart 3D Animated Visual Stage Generator for ANY Topic
 - 🧬 **Biology / DNA / Genetics:** Rotating 3D DNA Double Helix Animation with base pairs (`A-T`, `C-G`).
 - ⚡ **Physics / Forces / Motion / Newton:** Moving 3D Force Vector & Trajectory Simulator (`Gravity`, `Velocity`, `Friction`).
 - 📐 **Math / Geometry / Algebra:** Rotating 3D Geometric Shape & Calculation Engine.
@@ -69,17 +65,17 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 - 🗺️ **History / Milestones / Eras:** Animated Glowing Timeline Roadmap.
 - ⚛️ **Chemistry / Space / Universal Fallback:** Animated 3D Atomic Orbit & Concept Nucleus Network!
 
-### 🎙️ 11. Live Microphone Audio + Video Stream Recording
+### 🎙️ 12. Live Microphone Audio + Video Stream Recording
 - **MediaRecorder + Web Audio API:** Captures 30 FPS composite canvas rendering of avatar, subtitles, progress bar, and visual stage **merged with live microphone audio narration** into downloadable `.webm`/`.mp4` video files.
 
-### 📝 12. Assessment & Student Mastery Power Meter
+### 📝 13. Assessment & Student Mastery Power Meter
 - **Final Quiz & Grading:** 5-question comprehensive assessment.
 - **⚡ Student Haki Mastery Power Meter (0-100%):** Visual rank meter (`Novice ➔ Adept ➔ Master ➔ Supreme Haki Master`).
 
-### 📊 13. Personal History & Progress Dashboard (with Live Search & CSV Export)
+### 📊 14. Personal History & Progress Dashboard (with Live Search & CSV Export)
 - **🔍 Live Search Filter Bar:** Filter history records by topic, date, or score in real-time as you type.
 - **📥 CSV Data Export:** 1-click download of student learning session history as a structured `.csv` file.
-- **Persistent Database:** Backed by file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`).
+- **Persistent Database:** Backed by file-backed H2 database (`jdbc:h2:file:./data/aiteacherdb`) or PostgreSQL profile.
 
 ---
 
@@ -87,14 +83,14 @@ The system accepts any **topic** or **uploaded study document**, creates a struc
 
 ```markdown
 AI Teacher — Autonomous Multimodal Pedagogical SaaS Platform
-Tech Stack: Java 17, Spring Boot 3.5, Spring Data JPA, H2 Database, REST APIs, RAG (Retrieval-Augmented Generation), 
-            Apache Tika/PDFBox, Web Speech Synthesis API, Web Audio API, MediaRecorder API, HTML5/CSS3/JS
+Tech Stack: Java 17, Spring Boot 3.5, Spring Data JPA, H2 Database, PostgreSQL, REST APIs, WebSockets, 
+            RAG (Retrieval-Augmented Generation), Apache Tika/PDFBox, Web Speech Synthesis API, Web Audio API, MediaRecorder API, HTML5/CSS3/JS
 
 • Architected Full-Stack AI Learning SaaS: Engineered a Spring Boot & REST API backend integrated with OpenAI/Gemini endpoints, supporting autonomous lesson planning, interactive evaluation, misconception detection, and adaptive re-teaching.
 • Implemented Custom Offline RAG Pipeline: Built document text extraction (PDF/PPT/TXT) via Apache Tika/PDFBox and an in-memory Vector Store using local embeddings and similarity retrieval for grounded, hallucination-free lesson generation.
 • Real-Time Multimodal UI/UX & Web Speech Synthesis: Created a responsive single-page web app featuring 3D anime teacher personas, Web Speech API text-to-speech in 3 languages (English, Hindi, Kannada) with word-level subtitle synchronization.
 • Synchronized Audio/Video Stream Capture: Engineered live browser recording using MediaRecorder API and Web Audio API (AudioContext) stream mixing, rendering 30 FPS downloadable WebM/MP4 lesson recordings with live microphone audio.
-• Persistent Analytics & Session Engine: Built a Spring Data JPA persistence layer backed by H2 database storing student progress, session metrics, misconception logs, and concept roadmap analytics.
+• Persistent Analytics & Session Engine: Built a Spring Data JPA persistence layer backed by H2 database or PostgreSQL storing student progress, session metrics, misconception logs, and concept roadmap analytics.
 ```
 
 ---
@@ -152,24 +148,9 @@ Open browser at: **[http://localhost:8080](http://localhost:8080)**
 | POST | `/api/assessment/submit` | Grade assessment & generate learning report |
 | POST | `/api/progress` | Save completed learning session |
 | GET | `/api/progress/summary?studentName=…` | Fetch student history & progress metrics |
+| WS | `/ws/ask-teacher` | Real-time WebSocket streaming AI chat |
 
 ---
-
-## 🚀 Platform Capabilities (latest)
-
-- **🎬 Guest Demo Mode** — `Try a Demo Lesson` on the login screen (or `index.html?demo=1`) explores the full app without an account.
-- **🎨 Landing Page** — `landing.html` introduces the product and deep-links into demo mode.
-- **🎤 Voice Answers** — speak answers to check questions (Web Speech Recognition, English/Hindi/Kannada) via the mic button on any answer box.
-- **🔊 Persona Voice Preview** — every persona card in the wizard has a `Hear voice` button that speaks a sample line before you commit.
-- **🛡️ AI Resilience & Fair Use** — a provider fallback chain (`AI_FALLBACK_BASE_URL`/`AI_FALLBACK_API_KEY`/`AI_FALLBACK_MODEL`) retries failed calls on a second provider (streaming never replays delivered deltas), and a per-user sliding-window rate limiter (`AI_RATE_LIMIT`, default 30 req/min keyed on `X-Student-Email`, IP fallback for demos) sheds abuse with `429` + `Retry-After` before it costs money.
-- **💬 Ask the Teacher (live chat)** — bidirectional WebSocket chat at `/ws/ask`: streaming deltas, per-lesson conversation history with reconnect replay and AI context, chat-clear, plus automatic HTTP fallback (`/api/lesson/ask`) when sockets are blocked.
-- **🲸 SSE Streaming** — lessons *and* check questions generate token-by-token (`/api/lesson/plan/stream`, `/api/lesson/question/stream`): the AI writes live on screen while the response is still in flight.
-- **🌐 UI i18n** — the app chrome translates to Hindi/Kannada via `js/i18n.js` (follows the Preferred Language selector).
-- **📱 Installable PWA** — `manifest.webmanifest` + `sw.js` (offline app shell; API calls are always live).
-- **🔐 BCrypt Passwords** — hashes upgraded from the legacy scheme with transparent migration on login; minimum 8 characters.
-- **📊 Live API Docs** — Swagger UI at `/swagger-ui.html` (springdoc-openapi).
-- **🐳 Docker Deployment** — `docker compose up --build` runs the app + PostgreSQL (`SPRING_PROFILES_ACTIVE=postgres`), with `Dockerfile` for custom builds.
-- **🤖 CI** — GitHub Actions runs the full test suite and JAR build on every push/PR (`.github/workflows/ci.yml`).
 
 ## 🧪 Testing
 
@@ -178,22 +159,6 @@ Run the full automated test suite (210 unit & integration tests):
 ```bash
 cmd /c mvnw.cmd test
 ```
-
-### Browser E2E tests (Playwright)
-
-The `e2e/` specs cover the AI-free journey — landing page, demo mode, auth UI,
-i18n and PWA assets — against the real Spring Boot app:
-
-```bash
-npm install
-npx playwright install chromium
-cmd /c npm run e2e
-```
-
-`playwright.config.js` boots the app itself (`mvnw spring-boot:run`, reusing an
-already-running instance). Full lesson E2E additionally requires `AI_API_KEY`.
-
-<!-- 📺 TODO: add a demo GIF here: https://github.com/your-username/ai-teacher/raw/main/docs/demo.gif -->
 
 Build production JAR package:
 
