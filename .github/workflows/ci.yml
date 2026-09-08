@@ -17,8 +17,11 @@ jobs:
           java-version: '17'
           cache: maven
 
+      - name: Make Maven Wrapper executable
+        run: chmod +x mvnw
+
       - name: Run full test suite
-        run: mvn -B test
+        run: ./mvnw -B test
 
       - name: Build production JAR
-        run: mvn -B package -DskipTests
+        run: ./mvnw -B package -DskipTests
